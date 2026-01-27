@@ -9,6 +9,8 @@ import Button from '../../components/common/Button';
 import ParticlesBackground from '../../components/common/ParticlesBackground';
 import promoImg from '../../assets/images/fridge-repair.png';
 import MobileHomePage from './MobileHomePage';
+import SplitText from '../../react-bit/SplitText';
+import TextType from '../../react-bit/TextType';
 
 const iconMap = {
   Hammer,
@@ -27,6 +29,7 @@ const placeholders = [
 
 const HomePage = () => {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [typingStep, setTypingStep] = useState(0);
   const [fadeKey, setFadeKey] = useState(0);
   const overlayRef = useRef(null);
   const containerRef = useRef(null);
@@ -40,6 +43,23 @@ const HomePage = () => {
       ease: "power3.out"
     });
   }, { scope: containerRef });
+
+  useGSAP(() => {
+    if (typingStep === 3) {
+      gsap.fromTo(".book-btn",
+        { x: -50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+      );
+      gsap.fromTo(".explore-btn",
+        { x: 50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+      );
+      gsap.fromTo(".trust-item",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, delay: 0.4, ease: "back.out(1.7)" }
+      );
+    }
+  }, { scope: containerRef, dependencies: [typingStep] });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -105,17 +125,63 @@ const HomePage = () => {
               <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
                 Home Services, <br className="hidden md:block" />
                 <span className="text-white">
-                  On Demand.
+                  <SplitText
+                    text="On-demand!"
+                    className="text-4xl md:text-6xl font-extrabold text-center"
+                    delay={50}
+                    duration={1.25}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 40 }}
+                    to={{ opacity: 1, y: 0 }}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    textAlign="center"
+                    showCallback
+                  />
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                Expert professionals for all your home repair needs. <br className="hidden md:block" />
-                <span className="font-medium text-slate-200">Quick, reliable, and affordable</span> services at your doorstep.
+                <TextType
+                  text="Expert professionals for all your home repair needs."
+                  typingSpeed={10}
+                  loop={false}
+                  showCursor={typingStep === 0}
+                  onSentenceComplete={() => setTypingStep(1)}
+                  cursorCharacter=""
+                  className="inline"
+                  as="span"
+                />
+                <br className="hidden md:block" />
+                {typingStep >= 1 && (
+                  <span className="font-medium text-slate-200">
+                    <TextType
+                      text="Quick, reliable, and affordable"
+                      typingSpeed={10}
+                      loop={false}
+                      showCursor={typingStep === 1}
+                      onSentenceComplete={() => setTypingStep(2)}
+                      cursorCharacter=""
+                      className="inline"
+                      as="span"
+                    />
+                  </span>
+                )}
+                {typingStep >= 2 && (
+                  <TextType
+                    text=" services at your doorstep."
+                    typingSpeed={10}
+                    loop={false}
+                    showCursor={true}
+                    cursorCharacter="|"
+                    className="inline"
+                    as="span"
+                    onSentenceComplete={() => setTypingStep(3)}
+                  />
+                )}
               </p>
-
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto mb-12">
-                <Link to="/bookings">
+                <Link to="/bookings" className="book-btn opacity-0">
                   <Button
                     size="lg"
                     className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 shadow-xl border border-transparent rounded-full px-8 py-4 h-auto text-base font-bold transition-all duration-300 transform hover:-translate-y-1"
@@ -126,7 +192,7 @@ const HomePage = () => {
                     </div>
                   </Button>
                 </Link>
-                <Link to="/services">
+                <Link to="/services" className="explore-btn opacity-0">
                   <Button
                     size="lg"
                     variant="outline"
@@ -147,7 +213,7 @@ const HomePage = () => {
                   { icon: ShieldCheck, text: "Verified Experts" },
                   { icon: Award, text: "30-Day Warranty" }
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-md border border-slate-800 px-5 py-2.5 rounded-full hover:bg-slate-800/50 transition-colors duration-300 cursor-default">
+                  <div key={idx} className="trust-item opacity-0 flex items-center gap-2 bg-slate-900/50 backdrop-blur-md border border-slate-800 px-5 py-2.5 rounded-full hover:bg-slate-800/50 transition-colors duration-300 cursor-default">
                     <item.icon className="w-4 h-4 text-slate-400" />
                     <span className="text-slate-300 text-sm font-medium">{item.text}</span>
                   </div>

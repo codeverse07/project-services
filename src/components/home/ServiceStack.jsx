@@ -67,7 +67,7 @@ const ServiceStack = () => {
                 const lastCard = cards[cards.length - 1];
                 ScrollTrigger.create({
                     trigger: lastCard,
-                    start: "top 75%", // Start fading out almost as soon as the last card appears
+                    start: "top 0%", // Start fading out almost as soon as the last card appears
                     end: "bottom center",
                     onEnter: () => {
                         // Fade him out earlier so he's gone by the time the stack ends
@@ -127,7 +127,7 @@ const ServiceStack = () => {
                     but allows the worker to 'sit' there.
                 */}
                 <div className="sticky top-[68px] z-0 h-0 w-full pointer-events-none mb-0">
-                    <div ref={workerRef} className="absolute left-1/2 -translate-x-1/2 -top-0 w-[400px] transform">
+                    <div ref={workerRef} className="absolute left-1/2 -translate-x-1/2 -top-24 w-[400px] transform">
                         <WorkerCharacter pose="holding" mood="happy" className="drop-shadow-2xl" />
                     </div>
                 </div>

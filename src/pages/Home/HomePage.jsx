@@ -13,6 +13,8 @@ import promoImg from '../../assets/images/fridge-repair.png';
 import MobileHomePage from './MobileHomePage';
 import SplitText from '../../react-bit/SplitText';
 import TextType from '../../react-bit/TextType';
+import SupermanWorker from '../../components/home/SupermanWorker';
+
 
 const iconMap = {
   Hammer,
@@ -64,6 +66,74 @@ const HomePage = () => {
       );
     }
   }, { scope: containerRef, dependencies: [typingStep] });
+
+  useGSAP(() => {
+    // Superman Animation Sequence
+    // Initial Entrance (runs on load)
+    gsap.fromTo(".superman-container",
+      { y: "100vh" },
+      { y: 0, duration: 1.5, ease: "power3.out" }
+    );
+
+    // Initial Idle Float
+    gsap.to(".superman-container", {
+      y: -20,
+      duration: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+      delay: 1.5 // Start after entrance
+    });
+
+    // Scroll Animation (Scene) for Frame Switching
+    // We scroll scrub the body to change frames
+    const scrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "body", // Scroll whole page
+        start: "top top",
+        end: "700px top", // Increased distance for slower, smoother feel
+        scrub: 1 // Smoother catching up
+      }
+    });
+
+    /* 
+       Logic:
+       0% - 25%: Frame 0 (Initial)
+       25% - 50%: Frame 1 (Look up)
+       50% - 75%: Frame 2 (Ready)
+       75% - 100%: Frame 3 (Fly) + Movement
+    */
+
+    // Add continuous right drift (smooth movement effect)
+    scrollTl.to(".superman-container", {
+      x: 400, // Drifts right significantly as he prepares
+      ease: "power1.inOut",
+      duration: 0.4
+    }, 0);
+
+    // FRAME 1
+    scrollTl.to(".frame-0", { opacity: 0, duration: 0.05 }, 0.1)
+      .to(".frame-1", { opacity: 1, duration: 0.05 }, 0.1);
+
+    // FRAME 2
+    scrollTl.to(".frame-1", { opacity: 0, duration: 0.05 }, 0.2)
+      .to(".frame-2", { opacity: 1, duration: 0.05 }, 0.2);
+
+    // FRAME 3 (Takeoff) + Movement
+    scrollTl.to(".frame-2", { opacity: 0, duration: 0.05 }, 0.3)
+      .to(".frame-3", { opacity: 1, duration: 0.05 }, 0.3)
+      // Fly away logic - continues the motion
+      .to(".superman-container", {
+        x: 800, // Continue right
+        y: -1000, // Fly Up
+        scale: 0.5,
+        ease: "power1.in",
+        duration: 0.5
+      }, 0.35);
+
+  }, { scope: containerRef });
+
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -153,9 +223,11 @@ const HomePage = () => {
             </div>
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+
               <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
                 Home Services, <br className="hidden md:block" />
-                <span className="text-white">
+                <span className="text-white relative inline-block">
                   <SplitText
                     text="On-demand!"
                     className="text-4xl md:text-6xl font-extrabold text-center"
@@ -170,8 +242,14 @@ const HomePage = () => {
                     textAlign="center"
                     showCallback
                   />
+                  {/* Floating Worker Image Removed from here */}
                 </span>
               </h1>
+
+
+              <div className="superman-container absolute left-1/4 -ml-20 top-6 md:top-14 w-68 lg:w-80 h-96 z-20 hidden md:block pointer-events-none">
+                <SupermanWorker />
+              </div>
               <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
                 <TextType
                   text="Expert professionals for all your home repair needs."

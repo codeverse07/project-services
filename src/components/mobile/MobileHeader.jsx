@@ -2,9 +2,9 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MobileHeader = () => {
+const MobileHeader = ({ className }) => {
   return (
-    <div className="relative z-50 bg-[#FFFBF2] dark:bg-slate-950 pt-4 pb-4 px-4 transition-all">
+    <div className={`relative z-50 pt-4 pb-4 px-4 transition-all ${className || 'bg-[#FFFBF2] dark:bg-slate-950'}`}>
       <div className="flex items-center justify-between">
 
         {/* Futuristic Location Pill */}

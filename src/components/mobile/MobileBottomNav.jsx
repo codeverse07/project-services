@@ -2,7 +2,7 @@ import { Home, Search, Calendar, User, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 
-const MobileBottomNav = () => {
+const MobileBottomNav = ({ className }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { theme, toggleTheme } = useTheme();
@@ -15,7 +15,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <div className="fixed bottom-6 left-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/20 dark:border-slate-800 px-6 py-4 shadow-2xl shadow-rose-900/10 dark:shadow-black/50 rounded-2xl z-50 flex justify-between items-center md:hidden transition-all hover:scale-[1.01]">
+    <div className={`fixed bottom-6 left-6 right-6 backdrop-blur-xl border border-white/40 dark:border-white/10 px-6 py-3 shadow-2xl shadow-rose-900/10 dark:shadow-black/40 rounded-full z-50 flex justify-between items-center md:hidden transition-all hover:scale-[1.01] ${className || 'bg-white/50 supports-[backdrop-filter]:bg-white/40 dark:bg-slate-900/60'}`}>
       {navItems.map((item) => {
         const isActive = currentPath === item.path;
         return (

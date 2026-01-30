@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Phone, Mail, MapPin, ChevronRight, LogOut, Settings, CreditCard, Heart } from 'lucide-react';
+import { User, Phone, Mail, MapPin, ChevronRight, LogOut, Settings, CreditCard, Heart, Wrench, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MobileBottomNav from '../../components/mobile/MobileBottomNav';
 
@@ -28,7 +28,14 @@ const ProfilePage = () => {
 
         {/* Profile Header Card */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-rose-600 to-rose-400"></div>
+          <div className="h-32 relative">
+            <img
+              src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=1000"
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          </div>
           <div className="px-6 pb-6 relative">
             <div className="flex flex-col md:flex-row items-center md:items-end -mt-12 mb-4 gap-4">
               <div className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 shadow-md overflow-hidden bg-white dark:bg-slate-800">
@@ -84,10 +91,87 @@ const ProfilePage = () => {
 
       </div>
 
+      {/* Mobile Footer Links (Moved from Main Footer) - Only visible on mobile */}
+      <div className="md:hidden px-4 pt-8 pb-4 space-y-8">
+        {/* Quick Links */}
+        <div>
+          <h3 className="text-slate-900 dark:text-white font-bold text-lg mb-4">Quick Links</h3>
+          <ul className="space-y-3">
+            <li><Link to="/about" className="text-slate-600 dark:text-slate-400 font-medium">About Us</Link></li>
+            <li><Link to="/services" className="text-slate-600 dark:text-slate-400 font-medium">Our Services</Link></li>
+            <li><Link to="/pricing" className="text-slate-600 dark:text-slate-400 font-medium">Pricing</Link></li>
+            <li><Link to="/careers" className="text-slate-600 dark:text-slate-400 font-medium">Careers</Link></li>
+            <li><Link to="/contact" className="text-slate-600 dark:text-slate-400 font-medium">Contact</Link></li>
+          </ul>
+        </div>
+
+        {/* Services */}
+        <div>
+          <h3 className="text-slate-900 dark:text-white font-bold text-lg mb-4">Services</h3>
+          <ul className="space-y-3">
+            <li><Link to="/services/carpentry" className="text-slate-600 dark:text-slate-400 font-medium">Carpentry</Link></li>
+            <li><Link to="/services/electrical" className="text-slate-600 dark:text-slate-400 font-medium">Electrical</Link></li>
+            <li><Link to="/services/home-appliances" className="text-slate-600 dark:text-slate-400 font-medium">Home Appliances</Link></li>
+            <li><Link to="/services/plumbing" className="text-slate-600 dark:text-slate-400 font-medium">Plumbing</Link></li>
+            <li><Link to="/services/transport" className="text-slate-600 dark:text-slate-400 font-medium">Transport</Link></li>
+          </ul>
+        </div>
+
+        {/* Contact */}
+        <div>
+          <h3 className="text-slate-900 dark:text-white font-bold text-lg mb-4">Contact Us</h3>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 text-rose-600 dark:text-rose-500 shrink-0 mt-0.5" />
+              <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">123, Green Park, New Delhi, India 110016</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-rose-600 dark:text-rose-500 shrink-0" />
+              <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">+91 98765 43210</span>
+            </li>
+            <li className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-rose-600 dark:text-rose-500 shrink-0" />
+              <span className="text-slate-600 dark:text-slate-400 font-medium text-sm">support@reservice.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Footer Content (Moved from Main Footer) */}
+      <div className="px-6 py-8 md:hidden flex flex-col items-center text-center border-t border-gray-100 dark:border-slate-800 mt-4 bg-white dark:bg-slate-900 mx-4 rounded-2xl shadow-sm mb-24">
+        {/* Brand */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center">
+            <Wrench className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-xl font-bold text-slate-900 dark:text-white">
+            Reservice
+          </span>
+        </div>
+
+        {/* Social Icons */}
+        <div className="flex gap-4 mb-6">
+          <a href="#" className="w-10 h-10 rounded-full bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all">
+            <Facebook className="w-5 h-5" />
+          </a>
+          <a href="#" className="w-10 h-10 rounded-full bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all">
+            <Twitter className="w-5 h-5" />
+          </a>
+          <a href="#" className="w-10 h-10 rounded-full bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all">
+            <Instagram className="w-5 h-5" />
+          </a>
+        </div>
+
+        {/* Copyright */}
+        <div className="text-slate-400 text-xs font-medium">
+          <p>© {new Date().getFullYear()} Reservice. All rights reserved.</p>
+        </div>
+      </div>
+
       <div className="md:hidden">
         <MobileBottomNav />
       </div>
-    </div>
+    </div >
   );
 };
 

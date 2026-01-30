@@ -1,58 +1,93 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Mic, Tag, Star, Clock, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, MapPin, ArrowRight, Star, Clock, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { categories, services } from '../../data/mockData';
 import MobileHeader from '../../components/mobile/MobileHeader';
 import MobileBottomNav from '../../components/mobile/MobileBottomNav';
 import MobileServiceDetail from '../../pages/Services/MobileServiceDetail';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+const HERO_SLIDES = [
+  {
+    id: 1,
+    serviceId: 8, // Expert AC Repair
+    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200", // AC Repair
+    title: "Expert AC Repair",
+    subtitle: "Cooling solutions in minutes"
+  },
+  {
+    id: 2,
+    serviceId: 1, // Custom Carpentry
+    image: "https://images.unsplash.com/photo-1603533867307-b354255e3c32?auto=format&fit=crop&q=80&w=1200", // Custom/Expert Carpentry
+    title: "Custom Carpentry",
+    subtitle: "Furniture repair & assembly"
+  },
+  {
+    id: 3,
+    serviceId: 4, // Electrical
+    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=1200", // Electrical
+    title: "Electrical Safety",
+    subtitle: "Certified electricians"
+  },
+  {
+    id: 4,
+    serviceId: 3, // Plumbing
+    image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&q=80&w=1200", // Plumbing
+    title: "Plumbing Pros",
+    subtitle: "Leak repairs & installation"
+  },
+  {
+    id: 5,
+    serviceId: 5, // Fridge
+    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200", // Appliances
+    title: "Appliance Fixes",
+    subtitle: "Fridge, Washer & more"
+  },
+  {
+    id: 6,
+    serviceId: 6, // Transport
+    image: "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&q=80&w=1200", // Transport
+    title: "Safe Transport",
+    subtitle: "House shifting made easy"
+  },
+  {
+    id: 7,
+    serviceId: 7, // Deep Cleaning
+    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&q=80&w=1200", // Deep Cleaning
+    title: "Deep Cleaning",
+    subtitle: "Spotless home guaranteed"
+  }
+];
 
 const MobileHomePage = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedServiceId, setSelectedServiceId] = useState(null);
-  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('All');
+  const navigate = useNavigate();
 
-  // Auto-scroll banner
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentBannerIndex((prev) => (prev + 1) % 3);
-    }, 4000);
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
-  // Stories Data
-  const stories = [
-    { id: 1, name: 'Offers', image: 'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=150&h=150&fit=crop', viewed: false },
-    { id: 2, name: 'New', image: 'https://images.unsplash.com/photo-1581578731117-104f2a9d4549?w=150&h=150&fit=crop', viewed: true },
-    { id: 3, name: 'Cleaning', image: 'https://images.unsplash.com/photo-1584622050111-993a426fbf0a?w=150&h=150&fit=crop', viewed: false },
-    { id: 4, name: 'Repair', image: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=150&h=150&fit=crop', viewed: false },
-    { id: 5, name: 'Painting', image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=150&h=150&fit=crop', viewed: false },
-  ];
-
-  const testimonials = [
-    { id: 1, name: "Priya Sharma", text: "Amazing service! The cleaner was very professional.", rating: 5 },
-    { id: 2, name: "Rahul Verma", text: "Fixed my AC in 30 mins. Highly recommended!", rating: 4.8 },
-  ];
-
-  const mindCategories = [
-    ...categories,
-    { id: 9, name: 'Massage', image: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb8?w=150&h=150&fit=crop' },
-    { id: 10, name: 'Salon', image: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=150&h=150&fit=crop' },
-  ];
-
-  // Auto-cycle categories scale effect
-  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  // Auto-cycle categories scale effect (only if no filter selected)
   useEffect(() => {
+    if (activeCategoryFilter !== 'All') return;
     const interval = setInterval(() => {
-      setActiveCategoryIndex((prev) => (prev + 1) % mindCategories.slice(0, 8).length);
-    }, 1500); // Change every 1.5s
+      setActiveCategoryIndex((prev) => (prev + 1) % categories.slice(0, 8).length);
+    }, 1500);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeCategoryFilter]);
 
   const [activeCardId, setActiveCardId] = useState(null);
 
   // Intersection Observer for Zoom & Rotating Border Effect
-  const observerRef = React.useRef(null);
-  React.useEffect(() => {
+  const observerRef = useRef(null);
+  useEffect(() => {
     observerRef.current = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -70,116 +105,164 @@ const MobileHomePage = () => {
     cards.forEach(card => observerRef.current.observe(card));
 
     return () => observerRef.current.disconnect();
-  }, [services]); // Re-run if services change
+  }, [services]); // activeCategoryFilter removed from dependencies
+
+  const handleHeroClick = (slide) => {
+    if (slide.serviceId) {
+      setSelectedServiceId(slide.serviceId);
+    }
+  };
+
+  const handleCategoryClick = (categoryId) => {
+    // Redirect to Services page with strict filtering
+    navigate('/services', { state: { category: categoryId } });
+  };
+
+  // Always show top services on Home Page (no local filtering)
+  const displayedServices = services.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF2] dark:bg-slate-950 pb-28 font-sans selection:bg-rose-100 dark:selection:bg-rose-900/30 transition-colors duration-300">
-      {/* Service Detail Modal */}
-      {selectedServiceId && (
-        <MobileServiceDetail
-          serviceId={selectedServiceId}
-          onClose={() => setSelectedServiceId(null)}
-        />
-      )}
+    <div className="min-h-screen bg-[#FFFBF5] dark:bg-slate-950 pb-24 font-sans">
+      <AnimatePresence>
+        {selectedServiceId && (
+          <MobileServiceDetail
+            serviceId={selectedServiceId}
+            onClose={() => setSelectedServiceId(null)}
+          />
+        )}
+      </AnimatePresence>
 
       <MobileHeader />
 
-      <main className="space-y-8">
+      <main className="relative px-2 pt-2">
+        {/* Immersive Hero Section */}
+        <section
+          className="relative h-[65vh] w-full overflow-hidden rounded-[2.5rem] shadow-2xl z-0 cursor-pointer active:scale-[0.98] transition-all duration-300"
+          onClick={() => handleHeroClick(HERO_SLIDES[currentSlide])}
+        >
+          <AnimatePresence mode="popLayout">
+            <motion.img
+              key={currentSlide}
+              src={HERO_SLIDES[currentSlide].image}
+              alt="Hero"
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5 }}
+            />
+          </AnimatePresence>
 
-        {/* Search Bar - Sticky at Top */}
-        <div className="px-4 sticky top-0 z-40 bg-[#FFFBF2]/95 dark:bg-slate-950/95 backdrop-blur-sm pb-4 pt-2 transition-colors duration-300">
-          <div className="flex items-center gap-3">
-            {/* Floating Search Input */}
-            <div className="flex-1 relative shadow-[0_8px_20px_rgba(0,0,0,0.06)] dark:shadow-none rounded-full bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-800 transition-colors group">
+          {/* Overlay Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+
+          {/* Hero Content */}
+          <div className="absolute bottom-0 left-0 w-full p-6 pb-12 flex flex-col gap-2 z-10">
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <span className="inline-block px-3 py-1 bg-rose-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full mb-3 shadow-lg shadow-rose-500/30">
+                Premium Services
+              </span>
+              <h1 className="text-4xl font-black text-white leading-none mb-2 tracking-tight">
+                {HERO_SLIDES[currentSlide].title}
+              </h1>
+              <p className="text-slate-200 text-lg font-medium opacity-90">
+                {HERO_SLIDES[currentSlide].subtitle}
+              </p>
+            </motion.div>
+
+            {/* Glassmorphic Search Bar */}
+            <motion.div
+              className="mt-6 relative"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent hero click
+                navigate('/search');
+              }}
+            >
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-rose-500" />
+                <Search className="h-5 w-5 text-slate-400" />
               </div>
               <input
                 type="text"
-                className="block w-full pl-11 pr-4 py-3 border-none rounded-full bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 focus:outline-none focus:ring-0 text-sm font-bold tracking-wide"
-                placeholder="Search 'AC Service'..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                readOnly
+                className="block w-full pl-11 pr-4 py-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all font-medium text-sm shadow-xl cursor-text"
+                placeholder="What can we help you with?"
               />
-            </div>
-
-            {/* Isolated Round Mic Button */}
-            <div className="w-11 h-11 shrink-0 rounded-full bg-white dark:bg-slate-900 shadow-[0_8px_20px_rgba(0,0,0,0.06)] dark:shadow-none border border-gray-100 dark:border-slate-800 flex items-center justify-center cursor-pointer active:scale-90 transition-transform hover:border-rose-200 dark:hover:border-rose-800 group">
-              <Mic className="h-5 w-5 text-rose-500" />
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </section>
 
-        {/* What's on your mind? */}
-        <div className="px-4">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-slate-200 mb-4 tracking-wide uppercase opacity-80 pl-1">What's on your mind?</h2>
-          <div className="grid grid-cols-4 gap-y-6">
-            {mindCategories.slice(0, 8).map((cat, index) => (
-              <div key={cat.id} className="flex flex-col items-center gap-2 cursor-pointer group">
-                <div
-                  className={`w-[4.2rem] h-[4.2rem] rounded-full overflow-hidden shadow-sm border border-gray-100 dark:border-slate-800 transition-all duration-700 bg-white dark:bg-slate-900
-                    ${index === activeCategoryIndex ? 'scale-110 border-rose-400 ring-2 ring-rose-100 dark:ring-rose-900 shadow-lg' : 'group-hover:shadow-md'}`}
-                >
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <span className={`text-[10px] font-extrabold text-center uppercase tracking-tight leading-3 transition-colors duration-700 ${index === activeCategoryIndex ? 'text-rose-600 dark:text-rose-400' : 'text-gray-700 dark:text-slate-400'}`}>{cat.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-
-
-        {/* Hero Banners */}
-        <div className="pl-4 py-2">
-          <div className="flex overflow-x-auto gap-4 pr-4 snap-x hide-scrollbar">
-            {/* Banner 1 */}
-            <div className="min-w-[88vw] h-44 bg-gradient-to-r from-rose-600 to-rose-700 rounded-3xl relative overflow-hidden snap-center flex items-center px-6 shadow-xl shadow-rose-200/50">
-              <div className="text-white relative z-10">
-                <div className="text-[10px] font-black opacity-80 mb-2 tracking-widest uppercase bg-white/20 inline-block px-2 py-0.5 rounded-md">Summer Special</div>
-                <div className="text-3xl font-black italic leading-none mb-1">50%<br />OFF</div>
-                <div className="text-xs font-bold opacity-90 mb-3">On AC Service</div>
-                <button className="bg-white text-rose-600 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wide shadow-lg">Order Now</button>
-              </div>
-              <img src="https://images.unsplash.com/photo-1581094794329-cd56b50d7188?auto=format&fit=crop&w=300" className="absolute right-0 bottom-0 h-52 w-52 object-cover -rotate-12 translate-x-4 translate-y-4" alt="Offer" />
+        {/* Categories Grid */}
+        <section className="px-5 -mt-8 relative z-10">
+          <motion.div
+            className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-100 dark:border-slate-800"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8, type: "spring" }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                Categories
+              </h3>
+              <span className="text-xs font-semibold text-rose-500 flex items-center cursor-pointer" onClick={() => navigate('/services')}>View All <ArrowRight className="w-3 h-3 ml-1" /></span>
             </div>
-            {/* Banner 2 */}
-            <div className="min-w-[88vw] h-44 bg-gradient-to-r from-violet-600 to-indigo-700 rounded-3xl relative overflow-hidden snap-center flex items-center px-6 shadow-xl shadow-indigo-200/50">
-              <div className="text-white relative z-10">
-                <div className="text-[10px] font-black opacity-80 mb-2 tracking-widest uppercase bg-white/20 inline-block px-2 py-0.5 rounded-md">New Launch</div>
-                <div className="text-3xl font-black italic leading-none mb-1">SPA<br />AT HOME</div>
-                <div className="text-xs font-bold opacity-90 mb-3">Relax & Rejuvenate</div>
-                <button className="bg-white text-indigo-600 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wide shadow-lg">Explore</button>
-              </div>
-              <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300" className="absolute right-0 bottom-0 h-52 w-52 object-cover -rotate-12 translate-x-4 translate-y-4 opacity-70 mix-blend-overlay" alt="Offer" />
+            <div className="grid grid-cols-4 gap-y-6 gap-x-2">
+              {categories.slice(0, 8).map((cat, idx) => {
+                // const isActive = activeCategoryFilter === cat.id; // Removed
+                const isAutoActive = idx === activeCategoryIndex;
+
+                return (
+                  <motion.div
+                    key={cat.id}
+                    className="flex flex-col items-center gap-2 cursor-pointer"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.9 + (idx * 0.05) }}
+                    onClick={() => handleCategoryClick(cat.id)}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-700
+                      ${isAutoActive ? 'scale-110 border-rose-600 ring-2 ring-rose-200 dark:ring-rose-900 shadow-lg' : ''}`}>
+                      <img src={cat.image} className="w-full h-full object-cover opacity-90" alt={cat.name} />
+                    </div>
+                    <span className={`text-[10px] font-bold text-center leading-3 transition-colors duration-500 ${isAutoActive ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-400'}`}>{cat.name}</span>
+                  </motion.div>
+                );
+              })}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </section>
 
-        {/* Divider */}
-        <div className="h-px bg-rose-900/5 mx-6"></div>
-
-        {/* Recommended Cards with Zoom Effect */}
-        <div className="px-5 pb-4">
-          <h2 className="text-xl font-black text-gray-800 dark:text-white mb-5 flex items-center gap-2">
-            <span>Recommended</span>
-            <span className="text-[10px] font-bold text-white bg-black dark:bg-rose-600 px-2 py-0.5 rounded-md uppercase tracking-wider">PRO</span>
+        {/* Popular Services - Restored Large Cards & Zoom Effect */}
+        <section className="px-5 mt-8 pb-4">
+          <h2 className="text-xl font-extrabold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400 fill-current" />
+            Top Rated Services
           </h2>
 
-          <div className="flex flex-col gap-8">
-            {services.map((service) => (
+          <div className="flex flex-col gap-8 min-h-[300px]">
+            {displayedServices.map((service, idx) => (
               <div
                 key={service.id}
                 data-id={service.id}
                 onClick={() => setSelectedServiceId(service.id)}
-                className={`zoom-card relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform scale-100 rotating-border mb-8 ${activeCardId === service.id ? 'active' : ''}`}
+                className={`zoom-card relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform scale-100 rotating-border mb-8 ${activeCardId === service.id ? 'active' : ''} cursor-pointer active:scale-[0.98]`}
               >
-                {/* Inner Content Wrapper - CRITICAL for Rotating Border to show effectively */}
-                {/* Matches MobileSearchPage structure EXACTLY */}
+                {/* Inner Content Wrapper */}
                 <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900">
                   {/* Image Section */}
-                  <div className="h-56 relative">
-                    <img src={service.image} alt={service.title} className="w-full h-full object-cover" />
+                  <div className="h-56 relative overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className={`w-full h-full object-cover transition-transform duration-1000 ease-out ${activeCardId === service.id ? 'scale-110' : 'scale-100'}`}
+                    />
                     <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/50 to-transparent"></div>
                     <div className="absolute top-5 left-5">
                       <span className="bg-white/90 dark:bg-black/80 backdrop-blur text-black dark:text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wide shadow-sm">
@@ -187,7 +270,7 @@ const MobileHomePage = () => {
                       </span>
                     </div>
                     <div className="absolute top-5 right-5 w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" /></svg>
+                      <Star className="w-4 h-4 text-amber-400 fill-current" />
                     </div>
                   </div>
 
@@ -212,47 +295,19 @@ const MobileHomePage = () => {
                         <span className="text-lg font-black text-gray-900 dark:text-white">₹{service.price}</span>
                       </div>
                       <button className="bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wide hover:bg-rose-600 hover:text-white transition-colors">
-                        Add
+                        Book Now
                       </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Floating "TOP PICK" Badge - positioned EXACTLY as per user wish (overlapping border slightly) */}
-                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-black tracking-widest px-4 py-1 rounded-full shadow-lg shadow-rose-500/30 transition-all duration-300 ${activeCardId === service.id ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-90'}`}>
-                  TOP PICK
-                </div>
-              </div>
-            ))}</div>
-        </div>
-
-        {/* Happy Customers (Testimonials) - Restored */}
-        <div className="px-4 pb-6">
-          <h2 className="text-lg font-extrabold text-gray-900 dark:text-white mb-4">Happy Customers</h2>
-          <div className="grid gap-3">
-            {testimonials.map((t) => (
-              <div key={t.id} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-rose-50 dark:border-slate-800 flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/20 shrink-0 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                  {t.name.charAt(0)}
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-0.5">{t.name}</h4>
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-3 h-3 ${i < Math.floor(t.rating) ? 'text-yellow-400 fill-current' : 'text-gray-200 dark:text-slate-700'}`} />
-                    ))}
-                  </div>
-                  <p className="text-gray-500 dark:text-slate-400 text-xs leading-relaxed">"{t.text}"</p>
-                </div>
               </div>
             ))}
           </div>
-        </div>
-
+        </section>
       </main>
 
       <MobileBottomNav />
-    </div>
+    </div >
   );
 };
 

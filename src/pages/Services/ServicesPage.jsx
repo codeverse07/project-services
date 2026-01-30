@@ -1,7 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { useGSAP } from '@gsap/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, SlidersHorizontal, Star } from 'lucide-react';
 import { categories, services } from '../../data/mockData';
 import ServiceCard from '../../components/common/ServiceCard';
@@ -14,8 +12,18 @@ import BookingModal from '../../components/bookings/BookingModal';
 
 const ServicesPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { addBooking } = useBookings();
-    const [selectedCategory, setSelectedCategory] = useState('all');
+
+    // Initialize category from state if available
+    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'all');
+
+    // Update state if location changes
+    useEffect(() => {
+        if (location.state?.category) {
+            setSelectedCategory(location.state.category);
+        }
+    }, [location.state]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedService, setSelectedService] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,12 +38,8 @@ const ServicesPage = () => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         setActiveCardId(Number(entry.target.dataset.id));
-                        // Add active class manually if React state lag is an issue, 
-                        // but consistent with other pages we use state.
                         entry.target.classList.add('active');
                     } else {
-                        // We don't remove active class instantly on scroll out to keep it smooth? 
-                        // No, other pages toggle it.
                         entry.target.classList.remove('active');
                     }
                 });
@@ -47,17 +51,7 @@ const ServicesPage = () => {
         cards.forEach((card) => observer.observe(card));
 
         return () => observer.disconnect();
-    }, [filteredServices]);
-
-    useGSAP(() => {
-        gsap.from(".animate-item", {
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            stagger: 0.15,
-            ease: "power3.out"
-        });
-    }, { scope: containerRef });
+    }, [selectedCategory, searchQuery]); // Re-run when list changes
 
     const filteredServices = services.filter(service => {
         const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory;
@@ -66,6 +60,12 @@ const ServicesPage = () => {
     });
 
     const handleBookClick = (service) => {
+        // Redirect Transport services to specific page
+        if (service.category === 'transport') {
+            navigate('/transport');
+            return;
+        }
+
         setSelectedService(service);
         // On mobile we might want to go straight to booking or details? 
         // User asked for "cards like this" implying the detail view.
@@ -87,16 +87,19 @@ const ServicesPage = () => {
     };
 
     return (
-        <div ref={containerRef} className="relative min-h-screen bg-slate-50 dark:bg-slate-950 selection:bg-blue-100 dark:selection:bg-rose-900 overflow-hidden pb-20 md:pb-0 transition-colors duration-300">
-            {/* Mobile Header */}
-            <div className="md:hidden">
-                <MobileHeader />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 selection:bg-blue-100 dark:selection:bg-rose-900 overflow-hidden pb-24 md:pb-0 transition-colors duration-300 relative">
+
+            {/* Background Decorations - Fixed to cover full viewport including behind header/footer */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#475569_1px,transparent_1px)] [background-size:24px_24px] opacity-100 dark:opacity-50" />
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-500/10 dark:bg-rose-500/5 md:bg-blue-500/10 md:dark:bg-blue-500/5 rounded-full blur-3xl -translate-y-1/3 translate-x-1/3" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-slate-300/20 dark:bg-slate-800/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
             </div>
 
-            {/* Background Decorations */}
-            <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-100 dark:opacity-20" />
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-500/10 dark:bg-rose-500/5 md:bg-blue-500/10 md:dark:bg-blue-500/5 rounded-full blur-3xl -translate-y-1/3 translate-x-1/3" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-slate-300/20 dark:bg-slate-800/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
+            {/* Mobile Header - Transparent to show background */}
+            <div className="md:hidden relative z-50">
+                <MobileHeader className="bg-transparent" />
+            </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-12">
                 {/* Header Section */}

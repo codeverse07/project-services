@@ -165,8 +165,12 @@ const MobileBookingsPage = () => {
                     ))
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4">
-                            <Clock className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                        <div className="w-40 h-40 mb-4 rounded-full bg-slate-50 dark:bg-slate-900 overflow-hidden">
+                            <img
+                                src="https://images.unsplash.com/photo-1594824476961-b7aa5a1c00ea?auto=format&fit=crop&q=80&w=400"
+                                alt="No bookings"
+                                className="w-full h-full object-cover opacity-80"
+                            />
                         </div>
                         <h3 className="text-slate-900 dark:text-white font-bold mb-1">No {activeStatus.toLowerCase()} bookings</h3>
                         <p className="text-slate-400 dark:text-slate-500 text-sm">Your bookings list is empty.</p>

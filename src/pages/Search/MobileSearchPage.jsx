@@ -10,48 +10,8 @@ const MobileSearchPage = () => {
     const scrollContainerRef = useRef(null);
     const navigate = useNavigate();
 
-    // Rotating Border CSS
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.innerHTML = `
-      @property --angle {
-        syntax: '<angle>';
-        initial-value: 0deg;
-        inherits: false;
-      }
-      @keyframes spin-border {
-        to { --angle: 360deg; }
-      }
-      .rotating-border::before {
-        content: "";
-        position: absolute;
-        inset: -2px;
-        z-index: -1;
-        background: conic-gradient(from var(--angle), transparent 20%, #f43f5e 50%, transparent 80%);
-        border-radius: inherit;
-        animation: spin-border 3s linear infinite;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .rotating-border.active::before {
-        opacity: 1;
-      }
-      .rotating-border::after {
-        content: "";
-        position: absolute;
-        inset: 1px;
-        background: white;
-        border-radius: inherit;
-        z-index: -1;
-      }
-      /* Dark mode support for the inner card background */
-      :is(.dark) .rotating-border::after {
-        background: #0f172a; /* slate-900 */
-      }
-    `;
-        document.head.appendChild(style);
-        return () => document.head.removeChild(style);
-    }, []);
+    // Rotating Border CSS handled globally in index.css
+
 
     // Intersection Observer for Zoom & Rotating Effect
     useEffect(() => {
@@ -72,8 +32,8 @@ const MobileSearchPage = () => {
             },
             {
                 root: null,
-                threshold: 0.5, // Widen sweet spot
-                rootMargin: "-10% 0px -10% 0px" // More forgiving activation
+                threshold: 0.6, // Strict threshold - requires more visibility
+                rootMargin: "-45% 0px -45% 0px" // Very narrow active zone in center
             }
         );
 
@@ -133,7 +93,7 @@ const MobileSearchPage = () => {
             </div>
 
             {/* Results */}
-            <div className="px-5 pt-2 flex flex-col gap-6" ref={scrollContainerRef}>
+            <div className="px-5 pt-2 flex flex-col gap-12" ref={scrollContainerRef}>
                 <div className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1 pl-1">
                     {filteredServices.length} Results Found
                 </div>

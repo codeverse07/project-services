@@ -14,7 +14,9 @@ const MainLayout = () => {
                 <Outlet />
             </main>
 
-            <Footer />
+            <div className="hidden md:block">
+                <Footer />
+            </div>
         </div>
     );
 };

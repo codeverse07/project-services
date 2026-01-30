@@ -33,7 +33,7 @@ const Footer = () => {
                     </div>
 
                     {/* Quick Links */}
-                    <div>
+                    <div className="hidden md:block">
                         <h3 className="md:text-white text-slate-900 dark:text-white font-semibold text-lg mb-6">Quick Links</h3>
                         <ul className="space-y-4">
                             <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">About Us</a></li>
@@ -45,7 +45,7 @@ const Footer = () => {
                     </div>
 
                     {/* Services */}
-                    <div>
+                    <div className="hidden md:block">
                         <h3 className="md:text-white text-slate-900 dark:text-white font-semibold text-lg mb-6">Services</h3>
                         <ul className="space-y-4">
                             <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Carpentry</a></li>
@@ -57,7 +57,7 @@ const Footer = () => {
                     </div>
 
                     {/* Contact */}
-                    <div>
+                    <div className="hidden md:block">
                         <h3 className="md:text-white text-slate-900 dark:text-white font-semibold text-lg mb-6">Contact Us</h3>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">

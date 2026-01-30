@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Star, Clock, ShieldCheck, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Star, Clock, ShieldCheck, CheckCircle, ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom'; // In real app use useParams to fetch data
 import { services } from '../../data/mockData';
 

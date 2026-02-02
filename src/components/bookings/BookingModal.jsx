@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, Loader2, FileText } from 'lucide-react';
+import { X, Calendar, Clock, Loader2, FileText, MapPin } from 'lucide-react';
+import { useUser } from '../../context/UserContext';
 import Button from '../common/Button';
 import Input from '../common/Input';
 
 const BookingModal = ({ isOpen, onClose, service, onConfirm }) => {
+    const { user } = useUser();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         date: '',
         time: '',
-        description: ''
+        description: '',
+        pickupLocation: user?.addresses?.find(a => a.isPrimary)?.address || '',
+        dropLocation: ''
     });
 
+    // Update pickup location if user data loads or changes
+    React.useEffect(() => {
+        if (user?.addresses?.find(a => a.isPrimary)) {
+            setFormData(prev => ({
+                ...prev,
+                pickupLocation: prev.pickupLocation || user.addresses.find(a => a.isPrimary).address
+            }));
+        }
+    }, [user, isOpen]);
+
     if (!isOpen || !service) return null;
+
+    const isShiftingOrTransport = service.category === 'houseshifting' || service.category === 'transport';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,13 +35,21 @@ const BookingModal = ({ isOpen, onClose, service, onConfirm }) => {
 
         // Simulate network delay
         setTimeout(() => {
-            onConfirm({
+            const bookingData = {
                 ...formData,
                 serviceId: service.id,
                 serviceName: service.title,
                 image: service.image,
                 price: service.price
-            });
+            };
+
+            // Only include shifting-specific fields for relevant services
+            if (!isShiftingOrTransport) {
+                delete bookingData.dropLocation;
+                delete bookingData.pickupLocation;
+            }
+
+            onConfirm(bookingData);
             setIsLoading(false);
             onClose();
         }, 800);
@@ -46,6 +70,13 @@ const BookingModal = ({ isOpen, onClose, service, onConfirm }) => {
                     <p className="text-slate-500 text-sm mt-1">
                         {service.title} <span className="mx-1">•</span> ₹{service.price}
                     </p>
+                    {isShiftingOrTransport && (
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                            <p className="text-xs text-amber-700 font-medium">
+                                <strong>Note:</strong> Final shifting price will be fixed after distance verification and on-site inspection.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,6 +97,27 @@ const BookingModal = ({ isOpen, onClose, service, onConfirm }) => {
                             onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                             required
                         />
+
+                        {isShiftingOrTransport && (
+                            <>
+                                <Input
+                                    label="Pickup Location"
+                                    placeholder="Enter origin address"
+                                    icon={MapPin}
+                                    value={formData.pickupLocation}
+                                    onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
+                                    required
+                                />
+                                <Input
+                                    label="Drop Location"
+                                    placeholder="Enter destination address"
+                                    icon={MapPin}
+                                    value={formData.dropLocation}
+                                    onChange={(e) => setFormData({ ...formData, dropLocation: e.target.value })}
+                                    required
+                                />
+                            </>
+                        )}
                         <div className="space-y-1.5">
                             <label className="block text-sm font-medium text-slate-700 ml-1">
                                 Description

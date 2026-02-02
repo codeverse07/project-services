@@ -18,8 +18,16 @@ export const BookingProvider = ({ children }) => {
         setBookings([bookingWithId, ...bookings]);
     };
 
+    const cancelBooking = (id) => {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status: 'Canceled' } : b));
+    };
+
+    const updateBookingStatus = (id, status) => {
+        setBookings(bookings.map(b => b.id === id ? { ...b, status } : b));
+    };
+
     return (
-        <BookingContext.Provider value={{ bookings, addBooking }}>
+        <BookingContext.Provider value={{ bookings, addBooking, cancelBooking, updateBookingStatus }}>
             {children}
         </BookingContext.Provider>
     );

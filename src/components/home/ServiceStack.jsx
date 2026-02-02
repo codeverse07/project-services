@@ -3,7 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { categories } from '../../data/mockData';
 import WorkerCharacter from './WorkerCharacter';
-import { Hammer, Zap, Refrigerator, Droplets, Truck } from 'lucide-react';
+import { Hammer, Zap, Refrigerator, Droplets, Truck, Home } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,7 +12,8 @@ const iconMap = {
     Zap,
     Refrigerator,
     Droplets,
-    Truck
+    Truck,
+    Home
 };
 
 const ServiceStack = () => {

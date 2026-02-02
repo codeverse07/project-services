@@ -1,15 +1,16 @@
-import { Home, Search, Calendar, User, Moon, Sun } from 'lucide-react';
+import { Home, Search, Calendar, User, Bot, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
+import { motion } from 'framer-motion';
 
 const MobileBottomNav = ({ className }) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { theme, toggleTheme } = useTheme();
+  const { setIsChatOpen } = useUser();
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
-    { icon: Search, label: 'Search', path: '/search' }, // Updated to /search based on new page
+    { icon: Search, label: 'Search', path: '/search' },
     { icon: Calendar, label: 'Bookings', path: '/bookings' },
     { icon: User, label: 'Account', path: '/profile' },
   ];
@@ -25,26 +26,23 @@ const MobileBottomNav = ({ className }) => {
             className={`relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-xl group ${isActive ? '-translate-y-1' : ''}`}
           >
             {isActive && (
-              <span className="absolute -top-1 w-1 h-1 bg-rose-500 rounded-full animate-bounce"></span>
+              <span className="absolute -top-1 w-1.5 h-1.5 bg-rose-500 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.8)]"></span>
             )}
-            <div className={`p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 shadow-sm shadow-rose-100 dark:shadow-none' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 group-hover:bg-slate-50 dark:group-hover:bg-slate-800'}`}>
-              <item.icon className={`w-5 h-5 ${isActive ? 'fill-rose-600 dark:fill-rose-500/0' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+            <div className={`p-2 rounded-full transition-all duration-300 drop-shadow-sm ${isActive ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 shadow-sm' : 'text-slate-700 dark:text-slate-100 bg-black/5 dark:bg-white/5 group-hover:bg-black/10 dark:group-hover:bg-white/10'}`}>
+              <item.icon className={`w-5 h-5 ${isActive ? 'fill-rose-600 dark:fill-rose-500/0' : ''}`} strokeWidth={2.5} />
             </div>
           </Link>
         );
       })}
 
-      {/* Theme Toggle Button */}
+      {/* AI Chatbot Button */}
       <button
-        onClick={toggleTheme}
-        className="relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-xl group active:scale-95"
+        onClick={() => setIsChatOpen(true)}
+        className="relative flex flex-col items-center gap-1 transition-all duration-300 p-2 rounded-xl group active:scale-90"
       >
-        <div className="p-2 rounded-full transition-all duration-300 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50">
-          {theme === 'light' ? (
-            <Moon className="w-5 h-5 fill-current" />
-          ) : (
-            <Sun className="w-5 h-5 fill-current" />
-          )}
+        <div className="p-2.5 rounded-2xl transition-all duration-300 bg-gradient-to-tr from-rose-500 to-orange-500 text-white shadow-lg shadow-rose-500/25 group-hover:scale-110">
+          <Bot className="w-5 h-5" />
+          <Sparkles className="absolute -top-1 -right-1 w-3.5 h-3.5 text-white animate-pulse" />
         </div>
       </button>
     </div>

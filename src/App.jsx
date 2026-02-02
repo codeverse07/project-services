@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AnimatePresence, motion } from 'framer-motion';
 import { BookingProvider } from './context/BookingContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { UserProvider } from './context/UserContext';
+import { SoundProvider } from './context/SoundContext';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Auth/LoginPage';
@@ -12,6 +14,15 @@ import BookingsPage from './pages/Bookings/BookingsPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import MobileSearchPage from './pages/Search/MobileSearchPage';
 import TransportPage from './pages/Services/TransportPage';
+import HouseShiftingPage from './pages/Services/HouseShiftingPage';
+import SavedServicesPage from './pages/Saved/SavedServicesPage';
+import AddressesPage from './pages/Profile/AddressesPage';
+import AIChatBot from './components/mobile/AIChatBot';
+import { AdminProvider } from './context/AdminContext';
+import AdminLoginPage from './pages/Admin/AdminLoginPage';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import CareersPage from './pages/Static/CareersPage';
+import ContactPage from './pages/Static/ContactPage';
 import './App.css';
 
 function AnimatedRoutes() {
@@ -30,21 +41,23 @@ function AnimatedRoutes() {
   }, []);
 
   return (
-    <div style={isMobile ? { position: 'relative', minHeight: '100vh', overflowX: 'hidden' } : {}}>
-      <AnimatePresence>
+    <div
+      className="bg-white dark:bg-slate-950 transition-colors duration-300"
+      style={isMobile ? { position: 'relative', minHeight: '100vh', overflowX: 'hidden' } : {}}
+    >
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={isMobile ? location.pathname : 'desktop-view'}
           initial={isMobile ? { opacity: 0 } : false}
           animate={isMobile ? { opacity: 1 } : false}
           exit={isMobile ? { opacity: 0 } : false}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.05 }}
           className={isMobile ? "mobile-page-transition" : ""}
           style={isMobile ? {
-            position: 'absolute',
+            position: 'relative', // Changed from absolute to relative to avoid stacking issues during mode="wait"
             width: '100%',
-            top: 0,
-            left: 0,
-            zIndex: 0 // Base z-index
+            minHeight: '100vh',
+            zIndex: 0
           } : {}}
         >
           <Routes location={location}>
@@ -52,15 +65,26 @@ function AnimatedRoutes() {
               <Route index element={<HomePage />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="search" element={<MobileSearchPage />} />
+              <Route path="bookings" element={<BookingsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="saved" element={<SavedServicesPage />} />
+              <Route path="addresses" element={<AddressesPage />} />
+              <Route path="transport" element={<TransportPage />} />
+              <Route path="houseshifting" element={<HouseShiftingPage />} />
+              <Route path="careers" element={<CareersPage />} />
+              <Route path="contact" element={<ContactPage />} />
             </Route>
-            <Route path="/bookings" element={<BookingsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/transport" element={<TransportPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Isolated Admin Routes */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminLoginPage />} />
           </Routes>
         </motion.div>
       </AnimatePresence>
+      <AIChatBot />
     </div>
   );
 }
@@ -68,11 +92,17 @@ function AnimatedRoutes() {
 function App() {
   return (
     <BookingProvider>
-      <ThemeProvider>
-        <Router>
-          <AnimatedRoutes />
-        </Router>
-      </ThemeProvider>
+      <UserProvider>
+        <AdminProvider>
+          <ThemeProvider>
+            <SoundProvider>
+              <Router>
+                <AnimatedRoutes />
+              </Router>
+            </SoundProvider>
+          </ThemeProvider>
+        </AdminProvider>
+      </UserProvider>
     </BookingProvider>
   );
 }

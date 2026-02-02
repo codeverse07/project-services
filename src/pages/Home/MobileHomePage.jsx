@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, ArrowRight, Star, Clock, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { categories, services } from '../../data/mockData';
+import { services as staticServices } from '../../data/mockData';
+import { useAdmin } from '../../context/AdminContext';
 import MobileHeader from '../../components/mobile/MobileHeader';
 import MobileBottomNav from '../../components/mobile/MobileBottomNav';
 import MobileServiceDetail from '../../pages/Services/MobileServiceDetail';
@@ -11,49 +12,56 @@ const HERO_SLIDES = [
   {
     id: 1,
     serviceId: 8, // Expert AC Repair
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200", // AC Repair
+    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600", // AC Repair
     title: "Expert AC Repair",
     subtitle: "Cooling solutions in minutes"
   },
   {
     id: 2,
     serviceId: 1, // Custom Carpentry
-    image: "https://images.unsplash.com/photo-1603533867307-b354255e3c32?auto=format&fit=crop&q=80&w=1200", // Custom/Expert Carpentry
+    image: "https://images.unsplash.com/photo-1603533867307-b354255e3c32?auto=format&fit=crop&q=80&w=600", // Custom/Expert Carpentry
     title: "Custom Carpentry",
     subtitle: "Furniture repair & assembly"
   },
   {
     id: 3,
     serviceId: 4, // Electrical
-    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=1200", // Electrical
+    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600", // Electrical
     title: "Electrical Safety",
     subtitle: "Certified electricians"
   },
   {
     id: 4,
     serviceId: 3, // Plumbing
-    image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&q=80&w=1200", // Plumbing
+    image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&q=80&w=600", // Plumbing
     title: "Plumbing Pros",
     subtitle: "Leak repairs & installation"
   },
   {
     id: 5,
     serviceId: 5, // Fridge
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=1200", // Appliances
+    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=600", // Appliances
     title: "Appliance Fixes",
     subtitle: "Fridge, Washer & more"
   },
   {
     id: 6,
     serviceId: 6, // Transport
-    image: "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&q=80&w=1200", // Transport
+    image: "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?auto=format&fit=crop&q=80&w=600", // Transport
     title: "Safe Transport",
-    subtitle: "House shifting made easy"
+    subtitle: "Cargo & Goods delivery"
+  },
+  {
+    id: 8,
+    serviceId: 32, // House Shifting
+    image: "https://images.unsplash.com/photo-1603803835816-35bb3a52b0df?auto=format&fit=crop&q=80&w=600",
+    title: "House Shifting",
+    subtitle: "Hassle-free relocation"
   },
   {
     id: 7,
     serviceId: 7, // Deep Cleaning
-    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&q=80&w=1200", // Deep Cleaning
+    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&q=80&w=600", // Deep Cleaning
     title: "Deep Cleaning",
     subtitle: "Spotless home guaranteed"
   }
@@ -64,8 +72,10 @@ const MobileHomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedServiceId, setSelectedServiceId] = useState(null);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const [rotationIndex, setRotationIndex] = useState(0);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('All');
   const navigate = useNavigate();
+  const { services, categories } = useAdmin();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -78,10 +88,34 @@ const MobileHomePage = () => {
   useEffect(() => {
     if (activeCategoryFilter !== 'All') return;
     const interval = setInterval(() => {
-      setActiveCategoryIndex((prev) => (prev + 1) % categories.slice(0, 8).length);
+      setActiveCategoryIndex((prev) => (prev + 1) % 8);
     }, 1500);
     return () => clearInterval(interval);
   }, [activeCategoryFilter]);
+
+  // Handle Categories Rotation (Interchange)
+  useEffect(() => {
+    const activeCategories = categories.filter(c => c.isActive !== false);
+    if (activeCategories.length <= 8) return;
+
+    const rotationInterval = setInterval(() => {
+      setRotationIndex((prev) => (prev + 4) % activeCategories.length);
+    }, 30000); // Rotate every 30 seconds
+
+    return () => clearInterval(rotationInterval);
+  }, []);
+
+  const getVisibleCategories = () => {
+    const activeCategories = categories.filter(c => c.isActive !== false);
+    if (activeCategories.length <= 8) return activeCategories;
+
+    const visible = [];
+    for (let i = 0; i < 8; i++) {
+      const index = (rotationIndex + i) % activeCategories.length;
+      visible.push(activeCategories[index]);
+    }
+    return visible;
+  };
 
   const [activeCardId, setActiveCardId] = useState(null);
 
@@ -92,23 +126,25 @@ const MobileHomePage = () => {
       // Only apply scroll-driven active class on mobile
       if (window.innerWidth >= 768) return;
 
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setActiveCardId(Number(entry.target.dataset.id));
-          entry.target.classList.add('scale-[1.02]', 'shadow-2xl');
-          entry.target.classList.remove('scale-100', 'shadow-md');
-        } else {
-          entry.target.classList.remove('scale-[1.02]', 'shadow-2xl');
-          entry.target.classList.add('scale-100', 'shadow-md');
-        }
-      });
-    }, { threshold: 0.6, rootMargin: "-10% 0px -10% 0px" });
+      // Home-Specific: Elegant center capture for tall cards
+      const bestEntry = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (bestEntry && bestEntry.intersectionRatio > 0.15) {
+        const newId = Number(bestEntry.target.dataset.id);
+        setActiveCardId(prev => (prev === newId ? prev : newId));
+      }
+    }, {
+      threshold: [0, 0.5, 1], // Reduced threshold density for performance
+      rootMargin: "-15% 0px -15% 0px"
+    });
 
     const cards = document.querySelectorAll('.zoom-card');
     cards.forEach(card => observerRef.current.observe(card));
 
     return () => observerRef.current.disconnect();
-  }, [services]); // activeCategoryFilter removed from dependencies
+  }, [services]);
 
   const handleHeroClick = (slide) => {
     if (slide.serviceId) {
@@ -121,8 +157,8 @@ const MobileHomePage = () => {
     navigate('/services', { state: { category: categoryId } });
   };
 
-  // Always show top services on Home Page (no local filtering)
-  const displayedServices = services.slice(0, 5);
+  // Show only 7 services on Home Page as requested
+  const displayedServices = React.useMemo(() => services.filter(s => s.isActive !== false).slice(0, 7), [services]);
 
   return (
     <div className="min-h-screen bg-[#FFFBF5] dark:bg-slate-950 pb-24 font-sans">
@@ -215,29 +251,38 @@ const MobileHomePage = () => {
               </h3>
               <span className="text-xs font-semibold text-rose-500 flex items-center cursor-pointer" onClick={() => navigate('/services')}>View All <ArrowRight className="w-3 h-3 ml-1" /></span>
             </div>
-            <div className="grid grid-cols-4 gap-y-6 gap-x-2">
-              {categories.slice(0, 8).map((cat, idx) => {
-                // const isActive = activeCategoryFilter === cat.id; // Removed
-                const isAutoActive = idx === activeCategoryIndex;
+            <div className="grid grid-cols-4 gap-y-6 gap-x-2 relative min-h-[160px]">
+              <AnimatePresence mode="popLayout" initial={false}>
+                {getVisibleCategories().map((cat, idx) => {
+                  const isAutoActive = idx === activeCategoryIndex;
 
-                return (
-                  <motion.div
-                    key={cat.id}
-                    className="flex flex-col items-center gap-2 cursor-pointer"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.9 + (idx * 0.05) }}
-                    onClick={() => handleCategoryClick(cat.id)}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-700
-                      ${isAutoActive ? 'scale-110 border-rose-600 ring-2 ring-rose-200 dark:ring-rose-900 shadow-lg' : ''}`}>
-                      <img src={cat.image} className="w-full h-full object-cover opacity-90" alt={cat.name} />
-                    </div>
-                    <span className={`text-[10px] font-bold text-center leading-3 transition-colors duration-500 ${isAutoActive ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-400'}`}>{cat.name}</span>
-                  </motion.div>
-                );
-              })}
+                  return (
+                    <motion.div
+                      key={cat.id}
+                      layout
+                      className="flex flex-col items-center gap-2 cursor-pointer"
+                      initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: -20, scale: 0.8 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 30,
+                        mass: 1,
+                        delay: idx * 0.03
+                      }}
+                      onClick={() => handleCategoryClick(cat.id)}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden transition-all duration-700
+                        ${isAutoActive ? 'scale-110 border-rose-600 ring-2 ring-rose-200 dark:ring-rose-900 shadow-lg' : ''}`}>
+                        <img src={cat.image} className="w-full h-full object-cover opacity-90" alt={cat.name} />
+                      </div>
+                      <span className={`text-[10px] font-bold text-center leading-3 transition-colors duration-500 ${isAutoActive ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-400'}`}>{cat.name}</span>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           </motion.div>
         </section>
@@ -255,12 +300,12 @@ const MobileHomePage = () => {
                 key={service.id}
                 data-id={service.id}
                 onClick={() => setSelectedServiceId(service.id)}
-                className={`zoom-card relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform scale-100 rotating-border mb-8 ${activeCardId === service.id ? 'active' : ''} cursor-pointer active:scale-[0.98]`}
+                className={`zoom-card relative rounded-[2rem] ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform rotating-border-home ${activeCardId === service.id ? 'active scale-[1.02] shadow-2xl' : 'scale-100 shadow-md'} cursor-pointer active:scale-[0.98] mb-8`}
               >
                 {/* Inner Content Wrapper */}
-                <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900">
+                <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900 isolation-isolate">
                   {/* Image Section */}
-                  <div className="h-56 relative overflow-hidden">
+                  <div className="h-56 relative overflow-hidden rounded-t-[2rem]">
                     <img
                       src={service.image}
                       alt={service.title}

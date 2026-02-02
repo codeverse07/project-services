@@ -3,11 +3,15 @@ import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { Search, ArrowRight, ShieldCheck, Clock, Award, Hammer, Zap, Refrigerator, Droplets, Truck, Calendar, Map, CheckCircle } from 'lucide-react';
-import { categories, services } from '../../data/mockData';
+import { services as staticServices } from '../../data/mockData';
+import { useAdmin } from '../../context/AdminContext';
 import ServiceCard from '../../components/common/ServiceCard';
 import ServiceStack from '../../components/home/ServiceStack';
 import Button from '../../components/common/Button';
 import Particles from '../../react-bit/Particle';
+import BookingModal from '../../components/bookings/BookingModal';
+import { useBookings } from '../../context/BookingContext';
+import { useNavigate } from 'react-router-dom';
 
 import promoImg from '../../assets/images/fridge-repair.png';
 import MobileHomePage from './MobileHomePage';
@@ -34,11 +38,27 @@ const placeholders = [
 const particleColors = ['#ffffff', '#aaacb9'];
 
 const HomePage = () => {
+  const { services, categories } = useAdmin();
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [typingStep, setTypingStep] = useState(0);
   const [fadeKey, setFadeKey] = useState(0);
   const overlayRef = useRef(null);
   const containerRef = useRef(null);
+  const navigate = useNavigate();
+  const { addBooking } = useBookings();
+  const [selectedService, setSelectedService] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleBookClick = (service) => {
+    setSelectedService(service);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmBooking = (bookingData) => {
+    addBooking(bookingData);
+    setIsModalOpen(false);
+    navigate('/bookings');
+  };
 
   useGSAP(() => {
     gsap.from(".animate-item", {
@@ -364,12 +384,16 @@ const HomePage = () => {
                 <h2 className="text-3xl font-bold text-slate-900 mb-3">Most Popular Services</h2>
                 <p className="text-slate-500 text-lg">Booked by thousands of customers</p>
               </div>
-              <Button variant="ghost" className="hidden sm:flex text-slate-600 hover:text-slate-900" size="sm">View All <ArrowRight className="ml-2 w-4 h-4" /></Button>
+              <Link to="/services">
+                <Button variant="ghost" className="hidden sm:flex text-slate-600 hover:text-slate-900" size="sm">
+                  View All <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.slice(0, 3).map((service) => (
-                <ServiceCard key={service.id} service={service} />
+                <ServiceCard key={service.id} service={service} onBook={handleBookClick} />
               ))}
             </div>
           </section>
@@ -384,9 +408,11 @@ const HomePage = () => {
                   <div className="bg-white/10 backdrop-blur-sm px-6 py-3.5 rounded-xl border border-white/10 text-slate-200 font-mono tracking-wider text-center select-all">
                     NEWUSER20
                   </div>
-                  <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 border-none shadow-xl cursor-pointer font-bold px-8">
-                    Book a Repair
-                  </Button>
+                  <Link to="/bookings">
+                    <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 border-none shadow-xl cursor-pointer font-bold px-8">
+                      Book a Repair
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
@@ -412,6 +438,12 @@ const HomePage = () => {
             </div>
           </section>
         </div >
+        <BookingModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          service={selectedService}
+          onConfirm={handleConfirmBooking}
+        />
       </div >
     </>
   );

@@ -5,6 +5,8 @@ import { useGSAP } from '@gsap/react';
 import { Clock, CheckCircle, User, Calendar, ChevronRight, Search, History, XCircle, TrendingUp, ShieldQuestion, Phone, Mail, Sparkles } from 'lucide-react';
 import Button from '../../components/common/Button';
 import { useBookings } from '../../context/BookingContext';
+import { useUser } from '../../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 import MobileBookingsPage from './MobileBookingsPage';
 
 const StatusBadge = ({ status }) => {
@@ -142,7 +144,17 @@ const SupportWidget = () => (
 const BookingsPage = () => {
     const [activeTab, setActiveTab] = useState('Pending'); // Pending, Assigned, Completed, History
     const { bookings } = useBookings();
+    const { user, isAuthenticated } = useUser();
+    const navigate = useNavigate();
     const containerRef = useRef(null);
+
+    React.useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
+        }
+    }, [isAuthenticated, navigate]);
+
+    if (!user) return null;
 
     useGSAP(() => {
         gsap.from(".animate-item", {
@@ -178,7 +190,7 @@ const BookingsPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 items-end animate-item">
                         <div className="lg:col-span-2">
                             <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                                Welcome, Sachin <Sparkles className="inline-block w-8 h-8 text-yellow-400 ml-2 fill-yellow-400" />
+                                Welcome, {user.name.split(' ')[0]} <Sparkles className="inline-block w-8 h-8 text-yellow-400 ml-2 fill-yellow-400" />
                             </h1>
                             <p className="text-slate-500">Here's the status of your service requests.</p>
                         </div>

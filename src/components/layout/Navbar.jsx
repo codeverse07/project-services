@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Menu, X, Wrench, User } from 'lucide-react';
+import { Menu, X, Wrench, User, Moon, Sun, Bot } from 'lucide-react';
 import Button from '../common/Button';
+import { useTheme } from '../../context/ThemeContext';
+import { useUser } from '../../context/UserContext';
+import { useSound } from '../../context/SoundContext';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const location = useLocation();
+    const { theme, toggleTheme } = useTheme();
+    const { setIsChatOpen, isAuthenticated } = useUser();
+    const { playGlassSound } = useSound();
 
     const isHomePage = location.pathname === '/';
 
@@ -31,16 +37,16 @@ const Navbar = () => {
     const isTransparent = isHomePage && !isScrolled;
 
     // Base Classes
-    const navClasses = `transition-all duration-300 z-50 ${isHomePage ? 'fixed w-full top-0' : 'sticky top-0 bg-white border-b border-slate-200'
+    const navClasses = `transition-all duration-300 z-50 ${isHomePage ? 'fixed w-full top-0' : 'sticky top-0 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800'
         } ${isTransparent
             ? 'bg-transparent'
-            : isHomePage ? 'bg-white/90 backdrop-blur-md shadow-sm' : ''
+            : isHomePage ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm' : ''
         }`;
 
     // Text Colors
-    const textColorClass = isTransparent ? 'text-white' : 'text-slate-600 hover:text-blue-600';
-    const activeColorClass = 'text-blue-600';
-    const logoColorClass = isTransparent ? 'text-white' : 'text-slate-900';
+    const textColorClass = isTransparent ? 'text-white' : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400';
+    const activeColorClass = 'text-blue-600 dark:text-blue-400';
+    const logoColorClass = isTransparent ? 'text-white' : 'text-slate-900 dark:text-white';
 
     const navLinks = [
         { name: 'Home', path: '/' },
@@ -82,20 +88,51 @@ const Navbar = () => {
 
                     {/* Desktop Auth Buttons */}
                     <div className="hidden md:flex items-center gap-4">
-                        <Link to="/login">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className={`transition-colors ${isTransparent ? 'text-white hover:text-blue-200 hover:bg-white/10' : 'text-slate-600 hover:text-blue-600'}`}
-                            >
-                                Log in
-                            </Button>
-                        </Link>
-                        <Link to="/register">
-                            <Button size="sm" className={isTransparent ? 'shadow-lg shadow-blue-500/30' : ''}>
-                                Sign up
-                            </Button>
-                        </Link>
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            className={`p-2 rounded-xl transition-all duration-300 active:scale-95 ${isTransparent
+                                ? 'bg-white/10 text-white hover:bg-white/20'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                }`}
+                            aria-label="Toggle Theme"
+                        >
+                            {theme === 'light' ? (
+                                <Moon className="w-5 h-5 fill-current" />
+                            ) : (
+                                <Sun className="w-5 h-5 fill-current" />
+                            )}
+                        </button>
+
+
+                        {!isAuthenticated ? (
+                            <>
+                                <Link to="/login">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className={`transition-colors ${isTransparent ? 'text-white hover:text-blue-200 hover:bg-white/10' : 'text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400'}`}
+                                    >
+                                        Log in
+                                    </Button>
+                                </Link>
+                                <Link to="/register">
+                                    <Button size="sm" className={isTransparent ? 'shadow-lg shadow-blue-500/30' : 'dark:bg-blue-600 dark:hover:bg-blue-700'}>
+                                        Sign up
+                                    </Button>
+                                </Link>
+                            </>
+                        ) : (
+                            <Link to="/profile">
+                                <Button
+                                    size="sm"
+                                    className={`flex items-center gap-2 font-bold ${isTransparent ? 'bg-white/20 text-white hover:bg-white/30 border-white/50 shadow-lg' : 'bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20'}`}
+                                >
+                                    <User className="w-4 h-4" />
+                                    <span>Profile</span>
+                                </Button>
+                            </Link>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}

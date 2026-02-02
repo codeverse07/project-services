@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Wrench, Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
@@ -20,13 +21,13 @@ const Footer = () => {
                             Professional home repair and transport services at your doorstep. Fast, reliable, and guaranteed quality.
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
+                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
                                 <Facebook className="w-5 h-5" />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
+                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
                                 <Twitter className="w-5 h-5" />
                             </a>
-                            <a href="#" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
+                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full md:bg-slate-800 bg-rose-50 dark:bg-slate-800 text-rose-600 dark:text-slate-400 md:text-slate-400 flex items-center justify-center md:hover:bg-blue-600 hover:bg-rose-600 hover:text-white transition-all">
                                 <Instagram className="w-5 h-5" />
                             </a>
                         </div>
@@ -36,11 +37,11 @@ const Footer = () => {
                     <div className="hidden md:block">
                         <h3 className="md:text-white text-slate-900 dark:text-white font-semibold text-lg mb-6">Quick Links</h3>
                         <ul className="space-y-4">
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">About Us</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Our Services</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Pricing</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Careers</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Contact</a></li>
+                            <li><Link to="/contact" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">About Us</Link></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Our Services</Link></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Pricing</Link></li>
+                            <li><Link to="/careers" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Careers</Link></li>
+                            <li><Link to="/contact" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Contact</Link></li>
                         </ul>
                     </div>
 
@@ -48,11 +49,11 @@ const Footer = () => {
                     <div className="hidden md:block">
                         <h3 className="md:text-white text-slate-900 dark:text-white font-semibold text-lg mb-6">Services</h3>
                         <ul className="space-y-4">
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Carpentry</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Electrical</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Home Appliances</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Plumbing</a></li>
-                            <li><a href="#" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Transport</a></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Carpentry</Link></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Electrical</Link></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Home Appliances</Link></li>
+                            <li><Link to="/services" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Plumbing</Link></li>
+                            <li><Link to="/transport" className="md:hover:text-blue-500 hover:text-rose-600 dark:hover:text-blue-400 transition-colors">Transport</Link></li>
                         </ul>
                     </div>
 

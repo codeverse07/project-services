@@ -1,22 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Search, SlidersHorizontal, Star } from 'lucide-react';
-import { categories, services } from '../../data/mockData';
+import { Search, SlidersHorizontal, Star, Heart, ChevronDown, ChevronUp, Grid, Hammer, Zap, Refrigerator, Droplets, Truck, Home, Sparkles, ShieldCheck, Paintbrush, Lock, Lightbulb } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { services as staticServices } from '../../data/mockData';
 import ServiceCard from '../../components/common/ServiceCard';
 import Button from '../../components/common/Button';
 import { useBookings } from '../../context/BookingContext';
+import { useAdmin } from '../../context/AdminContext';
+import { useUser } from '../../context/UserContext';
 import MobileHeader from '../../components/mobile/MobileHeader';
 import MobileBottomNav from '../../components/mobile/MobileBottomNav';
 import MobileServiceDetail from '../../pages/Services/MobileServiceDetail';
 import BookingModal from '../../components/bookings/BookingModal';
 
+
+
 const ServicesPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { addBooking } = useBookings();
+    const { services, categories } = useAdmin();
+    const { isAuthenticated, savedServices, toggleSavedService } = useUser();
+    const activeCategories = React.useMemo(() => categories.filter(c => c.isActive !== false), [categories]);
+
+    const activeServices = React.useMemo(() => services.filter(s => s.isActive !== false), [services]);
 
     // Initialize category from state if available
-    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'all');
+    const [selectedCategory, setSelectedCategory] = useState(location.state?.category || 'All');
 
     // Update state if location changes
     useEffect(() => {
@@ -30,6 +40,7 @@ const ServicesPage = () => {
     const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false);
     const containerRef = useRef(null);
     const [activeCardId, setActiveCardId] = useState(null);
+    const [isCategoriesExpanded, setIsCategoriesExpanded] = useState(false);
 
     // Intersection Observer for Mobile Rotating Border
     React.useEffect(() => {
@@ -47,7 +58,7 @@ const ServicesPage = () => {
                     }
                 });
             },
-            { threshold: 0.6, rootMargin: "-10% 0px -10% 0px" }
+            { threshold: 0.6, rootMargin: "-20% 0px -20% 0px" }
         );
 
         const cards = document.querySelectorAll('.service-card-item');
@@ -56,18 +67,27 @@ const ServicesPage = () => {
         return () => observer.disconnect();
     }, [selectedCategory, searchQuery]); // Re-run when list changes
 
-    const filteredServices = services.filter(service => {
-        const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory;
-        const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase());
+    // Filter services based on category and search
+    const filteredServices = activeServices.filter((service) => {
+        const matchesCategory =
+            selectedCategory === 'All' || service.category === selectedCategory;
+        const matchesSearch = service.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
+    // Handle back logic
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     const handleBookClick = (service) => {
-        // Redirect Transport services to specific page
-        if (service.category === 'transport') {
-            navigate('/transport');
+        if (!isAuthenticated) {
+            navigate('/login');
             return;
         }
+
 
         setSelectedService(service);
         // On mobile we might want to go straight to booking or details? 
@@ -89,6 +109,57 @@ const ServicesPage = () => {
         navigate('/bookings');
     };
 
+    const getCategoryIcon = (id) => {
+        const icons = {
+            carpentry: <Hammer className="w-5 h-5" />,
+            electrical: <Zap className="w-5 h-5" />,
+            homeappliance: <Refrigerator className="w-5 h-5" />,
+            plumber: <Droplets className="w-5 h-5" />,
+            transport: <Truck className="w-5 h-5" />,
+            houseshifting: <Home className="w-5 h-5" />,
+            cleaning: <Sparkles className="w-5 h-5" />,
+            pestcontrol: <ShieldCheck className="w-5 h-5" />,
+            gardening: <Droplets className="w-5 h-5" />,
+            painting: <Paintbrush className="w-5 h-5" />,
+            smarthome: <Lightbulb className="w-5 h-5" />,
+            security: <Lock className="w-5 h-5" />,
+            carwash: <Droplets className="w-5 h-5" />
+        };
+        return icons[id] || <Grid className="w-5 h-5" />;
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.04,
+                delayChildren: 0.02
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15, scale: 0.98 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+                type: 'spring',
+                damping: 30,
+                stiffness: 500
+            }
+        }
+    };
+
+    const sortedCategories = selectedCategory === 'All'
+        ? activeCategories
+        : [
+            activeCategories.find(c => c.id === selectedCategory),
+            ...activeCategories.filter(c => c.id !== selectedCategory)
+        ].filter(Boolean);
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 selection:bg-blue-100 dark:selection:bg-rose-900 overflow-hidden pb-24 md:pb-0 transition-colors duration-300 relative">
 
@@ -99,10 +170,10 @@ const ServicesPage = () => {
                 <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-slate-300/20 dark:bg-slate-800/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
             </div>
 
-            {/* Mobile Header - Transparent to show background */}
-            <div className="md:hidden relative z-50">
+            {/* Mobile Header Removed for cleaner browse experience */}
+            {/* <div className="md:hidden relative z-50">
                 <MobileHeader className="bg-transparent" />
-            </div>
+            </div> */}
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-12">
                 {/* Header Section */}
@@ -138,19 +209,19 @@ const ServicesPage = () => {
                             <h3 className="font-bold text-slate-900 dark:text-white mb-5">Categories</h3>
                             <div className="space-y-3">
                                 <label className="flex items-center gap-3 cursor-pointer group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === 'all' ? 'border-rose-600 md:border-blue-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
-                                        {selectedCategory === 'all' && <div className="w-2.5 h-2.5 rounded-full bg-rose-600 md:bg-blue-600" />}
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === 'All' ? 'border-rose-600 md:border-blue-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
+                                        {selectedCategory === 'All' && <div className="w-2.5 h-2.5 rounded-full bg-rose-600 md:bg-blue-600" />}
                                     </div>
                                     <input
                                         type="radio"
                                         name="category"
                                         className="hidden"
-                                        checked={selectedCategory === 'all'}
-                                        onChange={() => setSelectedCategory('all')}
+                                        checked={selectedCategory === 'All'}
+                                        onChange={() => setSelectedCategory('All')}
                                     />
-                                    <span className={`text-sm font-medium ${selectedCategory === 'all' ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200'}`}>All Services</span>
+                                    <span className={`text-sm font-medium ${selectedCategory === 'All' ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200'}`}>All Services</span>
                                 </label>
-                                {categories.map((cat) => (
+                                {sortedCategories.map((cat) => (
                                     <label key={cat.id} className="flex items-center gap-3 cursor-pointer group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === cat.id ? 'border-rose-600 md:border-blue-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
                                             {selectedCategory === cat.id && <div className="w-2.5 h-2.5 rounded-full bg-rose-600 md:bg-blue-600" />}
@@ -191,39 +262,108 @@ const ServicesPage = () => {
                         </div>
                     </div>
 
-                    {/* Mobile Category Pills */}
-                    <div className="lg:hidden animate-item mb-4 overflow-x-auto pb-2 -mx-4 px-4 flex gap-2 hide-scrollbar">
-                        <button
-                            onClick={() => setSelectedCategory('all')}
-                            className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${selectedCategory === 'all' ? 'bg-rose-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'}`}
-                        >
-                            All
-                        </button>
-                        {categories.map(cat => (
+                    {/* Mobile Category Pills / Grid Toggle */}
+                    <div className="lg:hidden animate-item mb-4">
+                        <div className="flex items-center justify-between mb-3 px-1">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Categories</span>
                             <button
-                                key={cat.id}
-                                onClick={() => setSelectedCategory(cat.id)}
-                                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${selectedCategory === cat.id ? 'bg-rose-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'}`}
+                                onClick={() => setIsCategoriesExpanded(!isCategoriesExpanded)}
+                                className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-3 py-1.5 rounded-full active:scale-95 transition-all outline-none"
                             >
-                                {cat.name}
+                                {isCategoriesExpanded ? (
+                                    <><ChevronUp className="w-3 h-3" /> Collapse</>
+                                ) : (
+                                    <><ChevronDown className="w-3 h-3" /> View All</>
+                                )}
                             </button>
-                        ))}
+                        </div>
+
+                        <AnimatePresence mode="wait">
+                            {!isCategoriesExpanded ? (
+                                <motion.div
+                                    key="pills"
+                                    initial={{ opacity: 0, y: -5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 5 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-x-auto pb-4 -mx-4 px-4 flex gap-2 hide-scrollbar"
+                                >
+                                    <button
+                                        onClick={() => setSelectedCategory('All')}
+                                        className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wider whitespace-nowrap transition-all shadow-sm ${selectedCategory === 'All' ? 'bg-rose-600 text-white shadow-rose-600/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'}`}
+                                    >
+                                        All ({activeServices.length})
+                                    </button>
+                                    {sortedCategories.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => setSelectedCategory(cat.id)}
+                                            className={`px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-wider whitespace-nowrap transition-all shadow-sm ${selectedCategory === cat.id ? 'bg-rose-600 text-white shadow-rose-600/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'}`}
+                                        >
+                                            {cat.name}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    layout
+                                    key="grid"
+                                    initial={{ opacity: 0, scale: 0.98, y: -5 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.98, y: -5 }}
+                                    transition={{ type: 'spring', damping: 30, stiffness: 450 }}
+                                    className="grid grid-cols-2 gap-2.5 p-3.5 bg-slate-100/40 dark:bg-slate-900/40 rounded-[2rem] border border-slate-200/60 dark:border-white/5 backdrop-blur-md shadow-inner overflow-hidden mb-6"
+                                >
+                                    <button
+                                        onClick={() => { setSelectedCategory('All'); setIsCategoriesExpanded(false); }}
+                                        className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all border ${selectedCategory === 'All' ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:shadow-md'}`}
+                                    >
+                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${selectedCategory === 'All' ? 'bg-white/20' : 'bg-slate-50 dark:bg-slate-800 text-rose-600'}`}>
+                                            <Grid className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-tight">All Services</span>
+                                    </button>
+                                    {activeCategories.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => { setSelectedCategory(cat.id); setIsCategoriesExpanded(false); }}
+                                            className={`p-3 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all border ${selectedCategory === cat.id ? 'bg-rose-600 text-white border-rose-600 shadow-lg shadow-rose-600/20' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:shadow-md'}`}
+                                        >
+                                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${selectedCategory === cat.id ? 'bg-white/20' : 'bg-slate-50 dark:bg-slate-800 text-rose-600'}`}>
+                                                {getCategoryIcon(cat.id)}
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-tight text-center leading-tight">{cat.name}</span>
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* Grid */}
-                    <div className="lg:col-span-9 animate-item">
+                    <motion.div
+                        layout
+                        key={selectedCategory + searchQuery}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                        className="lg:col-span-9"
+                    >
                         {filteredServices.length > 0 ? (
                             <div className="filter-services-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                                 {filteredServices.map(service => (
-                                    <div
+                                    <motion.div
                                         key={service.id}
+                                        variants={itemVariants}
+                                        layout
                                         data-id={service.id}
                                         onClick={() => handleBookClick(service)}
                                         className={`service-card-item relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform scale-100 rotating-border group ${activeCardId === service.id ? 'active' : ''}`}
                                     >
-                                        <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 transition-colors">
+                                        <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 transition-colors isolation-isolate">
                                             {/* Image Section */}
-                                            <div className="h-56 relative overflow-hidden">
+                                            <div className="h-56 relative overflow-hidden rounded-t-[2rem]">
                                                 <img src={service.image} alt={service.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
                                                 <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/50 to-transparent"></div>
                                                 <div className="absolute top-5 left-5">
@@ -231,8 +371,19 @@ const ServicesPage = () => {
                                                         Best Seller
                                                     </span>
                                                 </div>
-                                                <div className="absolute top-5 right-5 w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white">
-                                                    <Star className="w-4 h-4 fill-current text-yellow-400" />
+                                                <div className="absolute top-5 right-5 flex flex-col gap-2">
+                                                    <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white">
+                                                        <Star className="w-4 h-4 fill-current text-yellow-400" />
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleSavedService(service.id);
+                                                        }}
+                                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${savedServices.includes(service.id) ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-white/20 backdrop-blur text-white hover:bg-white/40'}`}
+                                                    >
+                                                        <Heart className={`w-4 h-4 ${savedServices.includes(service.id) ? 'fill-current' : ''}`} />
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -262,12 +413,7 @@ const ServicesPage = () => {
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {/* Floating "TOP PICK" Badge - Only visible on Mobile when Active */}
-                                        <div className={`md:hidden absolute -top-3 left-1/2 -translate-x-1/2 z-20 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-black tracking-widest px-4 py-1 rounded-full shadow-lg shadow-rose-500/30 transition-all duration-300 ${activeCardId === service.id ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-90'}`}>
-                                            TOP PICK
-                                        </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         ) : (
@@ -281,14 +427,14 @@ const ServicesPage = () => {
                                 </p>
                                 <Button
                                     variant="outline"
-                                    onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
+                                    onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
                                     className="dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
                                 >
                                     Clear all filters
                                 </Button>
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
             </div>
 
@@ -312,7 +458,7 @@ const ServicesPage = () => {
                     />
                 )
             }
-        </div >
+        </div>
     );
 };
 

@@ -25,5 +25,6 @@ router.use('/categories', categoryRoutes);
 router.use('/feedbacks', require('./feedbackRoutes'));
 router.use('/reviews', require('./reviewRoutes'));
 router.use('/payments', require('./paymentRoutes'));
+router.use('/ai', require('./aiRoutes'));
 
 module.exports = router;

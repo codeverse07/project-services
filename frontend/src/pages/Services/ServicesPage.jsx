@@ -87,19 +87,23 @@ const ServicesPage = () => {
             navigate('/login');
             return;
         }
-
-
         setSelectedService(service);
-        // On mobile we might want to go straight to booking or details? 
-        // User asked for "cards like this" implying the detail view.
-        // Let's open the Mobile Detail view for mobile, and Modal for desktop maybe?
-        // Or simpler: Open Mobile Detail view everywhere since it's responsive? 
-        // Actually MobileServiceDetail has a "Add to Cart" that could lead to booking.
-        // Let's assume on Mobile we open MobileServiceDetail.
+        if (window.innerWidth < 768) {
+            // On mobile, Book Now button goes to the mobile details/plan selection page
+            setIsMobileDetailOpen(true);
+        } else {
+            // On desktop, Book Now opens the direct booking flow modal
+            setIsModalOpen(true);
+        }
+    };
+
+    const handleDetailsClick = (service) => {
+        setSelectedService(service);
         if (window.innerWidth < 768) {
             setIsMobileDetailOpen(true);
         } else {
-            setIsModalOpen(true);
+            // Even on desktop, MobileServiceDetail can act as a details modal
+            setIsMobileDetailOpen(true);
         }
     };
 
@@ -209,8 +213,8 @@ const ServicesPage = () => {
                             <h3 className="font-bold text-slate-900 dark:text-white mb-5">Categories</h3>
                             <div className="space-y-3">
                                 <label className="flex items-center gap-3 cursor-pointer group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === 'All' ? 'border-rose-600 md:border-blue-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
-                                        {selectedCategory === 'All' && <div className="w-2.5 h-2.5 rounded-full bg-rose-600 md:bg-blue-600" />}
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === 'All' ? 'border-rose-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
+                                        {selectedCategory === 'All' && <div className="w-2.5 h-2.5 rounded-full bg-rose-600" />}
                                     </div>
                                     <input
                                         type="radio"
@@ -223,8 +227,8 @@ const ServicesPage = () => {
                                 </label>
                                 {sortedCategories.map((cat) => (
                                     <label key={cat.id} className="flex items-center gap-3 cursor-pointer group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === cat.id ? 'border-rose-600 md:border-blue-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
-                                            {selectedCategory === cat.id && <div className="w-2.5 h-2.5 rounded-full bg-rose-600 md:bg-blue-600" />}
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedCategory === cat.id ? 'border-rose-600' : 'border-slate-300 dark:border-slate-700 group-hover:border-slate-400 dark:group-hover:border-slate-500'}`}>
+                                            {selectedCategory === cat.id && <div className="w-2.5 h-2.5 rounded-full bg-rose-600" />}
                                         </div>
                                         <input
                                             type="radio"
@@ -351,68 +355,21 @@ const ServicesPage = () => {
                         className="lg:col-span-9"
                     >
                         {filteredServices.length > 0 ? (
-                            <div className="filter-services-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                            <div className="filter-services-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 md:gap-6">
                                 {filteredServices.map(service => (
                                     <motion.div
                                         key={service.id}
                                         variants={itemVariants}
                                         layout
                                         data-id={service.id}
-                                        onClick={() => handleBookClick(service)}
-                                        className={`service-card-item relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform scale-100 rotating-border group ${String(activeCardId) === String(service.id) ? 'active' : ''}`}
+                                        className={`service-card-item search-card-isolated relative rounded-[2rem] shadow-md dark:shadow-black/40 ring-1 ring-transparent dark:ring-white/5 transition-all duration-300 transform group ${String(activeCardId) === String(service.id) ? 'scale-[1.02] shadow-2xl' : 'scale-100'}`}
                                     >
-                                        <div className="rounded-[2rem] overflow-hidden w-full h-full relative z-10 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 transition-colors isolation-isolate">
-                                            {/* Image Section */}
-                                            <div className="h-56 relative overflow-hidden rounded-t-[2rem]">
-                                                <img src={service.image} alt={service.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                                                <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/50 to-transparent"></div>
-                                                <div className="absolute top-5 left-5">
-                                                    <span className="bg-white/90 dark:bg-black/80 backdrop-blur text-black dark:text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wide shadow-sm">
-                                                        Best Seller
-                                                    </span>
-                                                </div>
-                                                <div className="absolute top-5 right-5 flex flex-col gap-2">
-                                                    <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-full flex items-center justify-center text-white">
-                                                        <Star className="w-4 h-4 fill-current text-yellow-400" />
-                                                    </div>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            toggleSavedService(service.id);
-                                                        }}
-                                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${savedServices.includes(service.id) ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-white/20 backdrop-blur text-white hover:bg-white/40'}`}
-                                                    >
-                                                        <Heart className={`w-4 h-4 ${savedServices.includes(service.id) ? 'fill-current' : ''}`} />
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Text Content */}
-                                            <div className="p-5">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="text-xl font-extrabold text-gray-900 dark:text-white leading-tight">{service.title}</h3>
-                                                    <div className="bg-green-700 text-white text-xs font-bold px-2 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm">
-                                                        {service.rating} <Star className="w-2.5 h-2.5 fill-current" />
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-start gap-1.5 text-[11px] font-bold text-gray-500 dark:text-slate-400 mb-4 uppercase tracking-wide">
-                                                    <SlidersHorizontal className="w-3.5 h-3.5" />
-                                                    <span>{service.category}</span>
-                                                    <span className="mx-1">•</span>
-                                                    <span>Home Services</span>
-                                                </div>
-
-                                                <div className="flex items-center justify-between border-t border-dashed border-gray-100 dark:border-slate-800 pt-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-bold uppercase line-through">₹{service.price + 300}</span>
-                                                        <span className="text-lg font-black text-gray-900 dark:text-white">₹{service.price}</span>
-                                                    </div>
-                                                    <button className="bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wide hover:bg-rose-600 hover:text-white transition-colors">
-                                                        Book Now
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <ServiceCard
+                                            service={service}
+                                            onBook={handleBookClick}
+                                            onDetails={handleDetailsClick}
+                                            isActive={String(activeCardId) === String(service.id)}
+                                        />
                                     </motion.div>
                                 ))}
                             </div>

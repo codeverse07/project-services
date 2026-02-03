@@ -5,6 +5,30 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reservice - Home Services on Demand</title>
+    <!-- Resource Hints & Preloading -->
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <meta http-equiv="Cache-Control" content="max-age=31536000" />
+    <script>
+      // Intelligent Image Preloader
+      const preloadCrops = (urls) => {
+        urls.forEach(url => {
+          const img = new Image();
+          img.src = url;
+        });
+      };
+      
+      // Preload first few hero images and critical app shell images
+      window.addEventListener('scroll', () => {
+        // Delayed preloading to avoid blocking initial render
+        if (!window.hasPreloaded) {
+          preloadCrops([
+            'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600',
+            'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600'
+          ]);
+          window.hasPreloaded = true;
+        }
+      }, { once: true });
+    </script>
   </head>
   <body>
     <div id="root"></div>

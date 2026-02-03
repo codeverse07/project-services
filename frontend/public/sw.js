@@ -1,37 +1,60 @@
-/* eslint-disable no-restricted-globals */
-self.addEventListener('push', function (event) {
-    if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: '/logo192.png',
-            badge: '/logo192.png',
-            vibrate: [100, 50, 100],
-            data: {
-                dateOfArrival: Date.now(),
-                primaryKey: '1',
-                url: data.url || '/partner/dashboard'
-            },
-            actions: [
-                {
-                    action: 'explore', title: 'View Details',
-                    icon: '/logo192.png'
-                },
-                {
-                    action: 'close', title: 'Close',
-                    icon: '/logo192.png'
-                },
-            ]
-        };
-        event.waitUntil(
-            self.registration.showNotification(data.title, options)
-        );
-    }
+const CACHE_NAME = 'reservice-v1';
+const ASSETS_TO_CACHE = [
+    '/',
+    '/index.html',
+    '/vite.svg'
+];
+
+// Install Event
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS_TO_CACHE);
+        })
+    );
+    self.skipWaiting();
 });
 
-self.addEventListener('notificationclick', function (event) {
-    event.notification.close();
+// Activate Event
+self.addEventListener('activate', (event) => {
     event.waitUntil(
-        clients.openWindow(event.notification.data.url)
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
+});
+
+// Fetch Event - Stale-While-Revalidate Strategy
+self.addEventListener('fetch', (event) => {
+    // Only cache GET requests
+    if (event.request.method !== 'GET') return;
+
+    // Skip browser extensions and non-http(s)
+    if (!event.request.url.startsWith('http')) return;
+
+    event.respondWith(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(event.request).then((cachedResponse) => {
+                const fetchPromise = fetch(event.request).then((networkResponse) => {
+                    // Cache successful responses for images and scripts
+                    if (networkResponse.ok) {
+                        cache.put(event.request, networkResponse.clone());
+                    }
+                    return networkResponse;
+                }).catch(() => {
+                    // Fallback for offline if necessary
+                });
+
+                // Return cached response immediately if available, otherwise wait for network
+                return cachedResponse || fetchPromise;
+            });
+        })
     );
 });

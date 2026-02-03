@@ -46,3 +46,4 @@ build_error.txt
 lint_report.txt
 lint_report_final.txt
 backend_error.log
+.env*.local

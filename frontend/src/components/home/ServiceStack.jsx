@@ -1,7 +1,8 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { categories } from '../../data/mockData';
+import { useNavigate } from 'react-router-dom';
 import TechnicianCharacter from './TechnicianCharacter';
 import { Hammer, Zap, Refrigerator, Droplets, Truck, Home } from 'lucide-react';
 
@@ -16,10 +17,60 @@ const iconMap = {
     Home
 };
 
+const TypingEffect = ({ phrases }) => {
+    const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+    const [displayedText, setDisplayedText] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [typingSpeed, setTypingSpeed] = useState(100);
+
+    useEffect(() => {
+        const handleTyping = () => {
+            const currentPhrase = phrases[currentPhraseIndex];
+            const shouldDelete = isDeleting;
+
+            if (!shouldDelete && displayedText !== currentPhrase) {
+                // Typing
+                setDisplayedText(currentPhrase.substring(0, displayedText.length + 1));
+                setTypingSpeed(50 + Math.random() * 50);
+            } else if (shouldDelete && displayedText !== '') {
+                // Deleting
+                setDisplayedText(currentPhrase.substring(0, displayedText.length - 1));
+                setTypingSpeed(30);
+            } else if (!shouldDelete && displayedText === currentPhrase) {
+                // Wait before deleting
+                setTimeout(() => setIsDeleting(true), 2500);
+            } else if (shouldDelete && displayedText === '') {
+                // Move to next phrase
+                setIsDeleting(false);
+                setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
+            }
+        };
+
+        const timer = setTimeout(handleTyping, typingSpeed);
+        return () => clearTimeout(timer);
+    }, [displayedText, isDeleting, currentPhraseIndex, phrases, typingSpeed]);
+
+    return (
+        <div className="flex items-center gap-2">
+            <span className="text-xl md:text-3xl font-bold text-slate-100/90 leading-tight">
+                {displayedText}
+            </span>
+            <span className="w-1.5 h-8 md:h-10 bg-indigo-500 animate-pulse rounded-full shrink-0"></span>
+        </div>
+    );
+};
+
 const ServiceStack = () => {
     const containerRef = useRef(null);
     const technicianRef = useRef(null);
     const [activeCardId, setActiveCardId] = useState(categories[0].id);
+    const navigate = useNavigate();
+
+    const promises = [
+        "we assure you the 30 day guarantee of our services performed",
+        "only background-verified and expert technicians at your doorstep",
+        "quality service at transparent and upfront pricing"
+    ];
 
 
     useLayoutEffect(() => {
@@ -142,7 +193,8 @@ const ServiceStack = () => {
                     return (
                         <div
                             key={cat.id}
-                            className={`service-card sticky top-60 mb-20 w-full rounded-[2.5rem] shadow-2xl transition-all duration-500 z-40 group overflow-hidden bg-white ring-1 ring-slate-200/50 hover:ring-4 hover:ring-${colorName}-100`}
+                            onClick={() => navigate('/services', { state: { category: cat.id } })}
+                            className={`service-card sticky top-60 mb-20 w-full rounded-[2.5rem] shadow-2xl transition-all duration-500 z-40 group overflow-hidden bg-white ring-1 ring-slate-200/50 hover:ring-4 hover:ring-${colorName}-100 cursor-pointer`}
                         >
                             <div className="flex flex-col md:flex-row h-full">
                                 {/* Left Content Section */}
@@ -164,7 +216,10 @@ const ServiceStack = () => {
                                             {cat.description}
                                         </p>
 
-                                        <button className={`group/btn flex items-center gap-3 px-8 py-4 rounded-full bg-slate-900 text-white font-medium hover:bg-${colorName}-600 transition-all duration-300 w-fit drop-shadow-lg`}>
+                                        <button
+                                            onClick={() => navigate('/services', { state: { category: cat.id } })}
+                                            className={`group/btn flex items-center gap-3 px-8 py-4 rounded-full bg-slate-900 text-white font-medium hover:bg-${colorName}-600 transition-all duration-300 w-fit drop-shadow-lg`}
+                                        >
                                             <span>Book Now</span>
                                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover/btn:translate-x-1 transition-transform">
                                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -192,7 +247,16 @@ const ServiceStack = () => {
             </div>
 
             {/* "Curtain" to physically cover the technician if he lingers */}
-            <div className="relative w-full h-80 rounded-4xl bg-slate-800 z-10 -mt-40 pointer-events-none"></div>
+            <div className="relative w-full h-[400px] md:h-[500px] rounded-[3rem] md:rounded-[4rem] bg-slate-900 z-10 -mt-20 md:-mt-40 pointer-events-none overflow-hidden shadow-2xl flex items-center justify-center px-10 border border-white/5">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(99,102,241,0.15),transparent)]"></div>
+                <div className="max-w-3xl text-center space-y-6 relative z-10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                        <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Our Promise</span>
+                    </div>
+                    <TypingEffect phrases={promises} />
+                </div>
+            </div>
         </div>
     );
 };

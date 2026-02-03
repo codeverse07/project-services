@@ -114,47 +114,62 @@ const MobileServiceDetail = ({ serviceId, onClose }) => {
                         </p>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Select Service Plan</h3>
-                            <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded-lg flex items-center gap-1">
-                                <Sparkles className="w-3 h-3" /> Popular choice
-                            </span>
+                    {service.isComingSoon && (
+                        <div className="py-10 flex flex-col items-center justify-center text-center bg-rose-50/30 dark:bg-rose-500/5 rounded-[2.5rem] border border-dashed border-rose-200 dark:border-rose-900/30">
+                            <div className="w-16 h-16 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                                <Sparkles className="w-8 h-8 text-rose-500 animate-pulse" />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight mb-2">Stay Tuned!</h3>
+                            <p className="text-sm font-bold text-rose-500 animate-blink tracking-widest uppercase mb-4">Launching Soon</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[200px] font-medium leading-relaxed">
+                                We're preparing something special for you. This service will be available shortly!
+                            </p>
                         </div>
+                    )}
 
-                        <div className="grid grid-cols-1 gap-4">
-                            {subServices.length > 0 ? subServices.map((sub) => (
-                                <button
-                                    key={sub.id}
-                                    onClick={() => setSelectedSubService(sub.id)}
-                                    className={`relative p-5 rounded-[2rem] border-2 transition-all duration-300 text-left group flex items-center gap-4 ${selectedSubService === sub.id
-                                        ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/10'
-                                        : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'
-                                        }`}
-                                >
-                                    <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-md">
-                                        <img src={sub.image} className="w-full h-full object-cover" alt={sub.name} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-center mb-1">
-                                            <span className="font-black text-slate-900 dark:text-white uppercase tracking-tight">{sub.name}</span>
-                                            <span className="font-black text-indigo-600 dark:text-indigo-400">₹{sub.price}</span>
+                    {!service.isComingSoon && (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">Select Service Plan</h3>
+                                <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded-lg flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3" /> Popular choice
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                {subServices.length > 0 ? subServices.map((sub) => (
+                                    <button
+                                        key={sub.id}
+                                        onClick={() => setSelectedSubService(sub.id)}
+                                        className={`relative p-5 rounded-[2rem] border-2 transition-all duration-300 text-left group flex items-center gap-4 ${selectedSubService === sub.id
+                                            ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/10'
+                                            : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'
+                                            }`}
+                                    >
+                                        <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 shadow-md">
+                                            <img src={sub.image} className="w-full h-full object-cover" alt={sub.name} />
                                         </div>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2">{sub.description}</p>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="font-black text-slate-900 dark:text-white uppercase tracking-tight">{sub.name}</span>
+                                                <span className="font-black text-indigo-600 dark:text-indigo-400">₹{sub.price}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium line-clamp-2">{sub.description}</p>
+                                        </div>
+                                        <div className={`absolute top-4 right-4 transition-all duration-300 ${selectedSubService === sub.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
+                                            <CheckCircle className="w-6 h-6 text-indigo-600 fill-white dark:fill-slate-900" />
+                                        </div>
+                                    </button>
+                                )) : (
+                                    <div className="p-8 text-center bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+                                        <p className="text-slate-400 font-bold text-sm">No service plans currently available.</p>
                                     </div>
-                                    <div className={`absolute top-4 right-4 transition-all duration-300 ${selectedSubService === sub.id ? 'opacity-100 scale-100' : 'opacity-0 scale-50'}`}>
-                                        <CheckCircle className="w-6 h-6 text-indigo-600 fill-white dark:fill-slate-900" />
-                                    </div>
-                                </button>
-                            )) : (
-                                <div className="p-8 text-center bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
-                                    <p className="text-slate-400 font-bold text-sm">No service plans currently available.</p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {isShiftingOrTransport && (
+                    {!service.isComingSoon && isShiftingOrTransport && (
                         <div className="p-6 bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900/30 rounded-[2.5rem] shadow-sm space-y-4">
                             <div className="space-y-3">
                                 <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
@@ -190,7 +205,7 @@ const MobileServiceDetail = ({ serviceId, onClose }) => {
                         </div>
                     )}
 
-                    {isShiftingOrTransport && (
+                    {!service.isComingSoon && isShiftingOrTransport && (
                         <div className="p-5 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20 rounded-2xl">
                             <h4 className="text-xs font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest flex items-center gap-2 mb-2">
                                 <Sparkles className="w-4 h-4" /> Pricing Verification
@@ -225,13 +240,24 @@ const MobileServiceDetail = ({ serviceId, onClose }) => {
 
             {/* Bottom Sticky Button */}
             <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 z-20">
-                <button
-                    onClick={handleBooking}
-                    disabled={!activeSubService}
-                    className="w-full h-16 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[2rem] font-black text-lg shadow-xl shadow-slate-900/10 dark:shadow-white/5 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:active:scale-100"
-                >
-                    Book {activeSubService?.name || 'Service'} • ₹{activeSubService?.price || service.price}
-                </button>
+                {service.isComingSoon ? (
+                    <button
+                        onClick={onClose}
+                        className="w-full h-16 bg-rose-600 text-white rounded-[2rem] font-black text-lg shadow-xl shadow-rose-900/10 active:scale-95 transition-all flex items-center justify-center gap-3"
+                    >
+                        <Sparkles className="w-5 h-5 animate-pulse" />
+                        <span className="animate-blink">Coming Soon</span>
+                        <Sparkles className="w-5 h-5 animate-pulse" />
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleBooking}
+                        disabled={!activeSubService}
+                        className="w-full h-16 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[2rem] font-black text-lg shadow-xl shadow-slate-900/10 dark:shadow-white/5 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:active:scale-100"
+                    >
+                        Book {activeSubService?.name || 'Service'} • ₹{activeSubService?.price || service.price}
+                    </button>
+                )}
             </div>
         </motion.div>
     );

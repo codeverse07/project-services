@@ -8,20 +8,20 @@ exports.createBooking = async (req, res, next) => {
         const { serviceId, scheduledAt, notes } = req.body;
 
         // 1. Check if service exists AND is active
-        const service = await Service.findById(serviceId).populate('technician');
+        const service = await Service.findById(serviceId).populate('worker');
         if (!service || !service.isActive) {
             return next(new AppError('Service not found or not active', 404));
         }
 
         // 2. Prevent technician from booking their own service
-        if (service.technician._id.toString() === req.user.id) {
+        if (service.worker._id.toString() === req.user.id) {
             return next(new AppError('You cannot book your own service', 400));
         }
 
         // 3. Create Booking
         const booking = await Booking.create({
             customer: req.user.id,
-            technician: service.technician._id,
+            worker: service.worker._id,
             service: serviceId,
             price: service.price,
             scheduledAt,
@@ -30,7 +30,7 @@ exports.createBooking = async (req, res, next) => {
 
         // 4. Send Notification to Technician
         await notificationService.send({
-            recipient: service.technician._id,
+            recipient: service.worker._id,
             type: 'BOOKING_REQUEST',
             title: 'New Booking Request',
             message: `${req.user.name} has requested a booking for ${service.title}`,
@@ -64,7 +64,7 @@ exports.getAllBookings = async (req, res, next) => {
 
         // Filter by user role context
         if (req.user.role === 'TECHNICIAN') {
-            filter.technician = req.user.id;
+            filter.worker = req.user.id;
         } else if (req.user.role !== 'ADMIN') {
             filter.customer = req.user.id;
         }
@@ -83,7 +83,7 @@ exports.getAllBookings = async (req, res, next) => {
         const bookings = await Booking.find(filter)
             .populate('service', 'title price category')
             .populate('customer', 'name email phone location profilePhoto')
-            .populate('technician', 'name email phone profilePhoto')
+            .populate('worker', 'name email phone profilePhoto')
             .sort(sortStr);
 
         res.status(200).json({
@@ -103,7 +103,7 @@ exports.getBooking = async (req, res, next) => {
         const booking = await Booking.findById(req.params.bookingId)
             .populate('service', 'title price category')
             .populate('customer', 'name email')
-            .populate('technician', 'name email');
+            .populate('worker', 'name email');
 
         if (!booking) {
             return next(new AppError('No booking found with that ID', 404));
@@ -111,7 +111,7 @@ exports.getBooking = async (req, res, next) => {
 
         // Security: Ensure user is related to this booking
         const isCustomer = booking.customer._id.toString() === req.user.id;
-        const isTechnician = booking.technician._id.toString() === req.user.id;
+        const isTechnician = booking.worker._id.toString() === req.user.id;
         const isAdmin = req.user.role === 'ADMIN';
 
         if (!isCustomer && !isTechnician && !isAdmin) {
@@ -138,7 +138,7 @@ exports.updateBookingStatus = async (req, res, next) => {
             return next(new AppError('No booking found with that ID', 404));
         }
 
-        const isTechnician = booking.technician.toString() === req.user.id;
+        const isTechnician = booking.worker.toString() === req.user.id;
         const isCustomer = booking.customer.toString() === req.user.id;
 
         // State Machine Logic
@@ -148,7 +148,7 @@ exports.updateBookingStatus = async (req, res, next) => {
                 return next(new AppError('Cannot cancel booking at this stage', 400));
             }
             // Notification target logic
-            const recipient = isCustomer ? booking.technician : booking.customer;
+            const recipient = isCustomer ? booking.worker : booking.customer;
             await notificationService.send({
                 recipient,
                 type: 'BOOKING_CANCELLED',
@@ -214,7 +214,7 @@ exports.getTechnicianStats = async (req, res, next) => {
         const stats = await Booking.aggregate([
             {
                 $match: {
-                    technician: req.user._id,
+                    worker: req.user._id,
                     status: 'COMPLETED'
                 }
             },

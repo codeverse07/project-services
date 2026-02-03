@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Sparkles, X, Send, User } from 'lucide-react';
 import { useUser } from '../../context/UserContext';
 import { useSound } from '../../context/SoundContext';
+import client from '../../api/client';
 
 const AIChatBot = () => {
     const { isChatOpen, setIsChatOpen } = useUser();
@@ -28,7 +29,7 @@ const AIChatBot = () => {
         scrollToBottom();
     }, [messages]);
 
-    const handleSend = (e) => {
+    const handleSend = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
 
@@ -38,24 +39,30 @@ const AIChatBot = () => {
         setInput('');
         playGlassSound();
 
-        // Simulate AI response
-        setTimeout(() => {
-            const botResponse = {
+        // Call Backend API
+        try {
+            // Optimistic AI Thinking State or just wait
+            const res = await client.post('/ai/chat', { message: userMsg.text });
+
+            if (res.data.status === 'success') {
+                const botResponse = {
+                    id: Date.now() + 1,
+                    text: res.data.data.message,
+                    sender: 'bot',
+                    intent: res.data.data.intent
+                };
+                setMessages(prev => [...prev, botResponse]);
+                playGlassSound();
+            }
+        } catch (error) {
+            console.error("AI Chat Error:", error);
+            const errorResponse = {
                 id: Date.now() + 1,
-                text: getSimulatedResponse(input),
+                text: "I'm having trouble connecting to the server. Please try again later.",
                 sender: 'bot'
             };
-            setMessages(prev => [...prev, botResponse]);
-            playGlassSound();
-        }, 1000);
-    };
-
-    const getSimulatedResponse = (query) => {
-        const q = query.toLowerCase();
-        if (q.includes('price')) return "Our starting price for home cleaning is ₹499. Would you like to see our full price list?";
-        if (q.includes('repair')) return "We have expert technicians available for all kinds of repairs. Which service do you need?";
-        if (q.includes('hello') || q.includes('hi')) return "Hi there! I'm ready to help you find the best service for your home.";
-        return "That's interesting! Let me find more information about that for you.";
+            setMessages(prev => [...prev, errorResponse]);
+        }
     };
 
     return (

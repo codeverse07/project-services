@@ -21,10 +21,16 @@ export const AdminProvider = ({ children }) => {
         };
     });
 
-    // Categories are static for now as backend doesn't seem to have a dedicated settings/categories endpoint
-    const [categories, setCategories] = useState(initialCategories);
+    // Categories are initialized from localStorage for zero-lag loading
+    const [categories, setCategories] = useState(() => {
+        const saved = localStorage.getItem('app_categories');
+        return saved ? JSON.parse(saved) : initialCategories;
+    });
 
-    const [services, setServices] = useState(initialServices);
+    const [services, setServices] = useState(() => {
+        const saved = localStorage.getItem('app_services');
+        return saved ? JSON.parse(saved) : initialServices;
+    });
     const [technicians, setTechnicians] = useState([]);
     const [feedbacks, setFeedbacks] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -43,7 +49,7 @@ export const AdminProvider = ({ children }) => {
             'pest control': 'pestcontrol',
             'pestcontrol': 'pestcontrol',
             'home appliance': 'homeappliance',
-            'homeappliance': 'homeappliance', 'appliances': 'homeappliance',
+            'homeappliance': 'homeappliance', 'appliances': 'homeappliance', 'appliance': 'homeappliance',
             'electrical': 'electrical',
             'electrician': 'electrical',
             'cleaning': 'cleaning',
@@ -101,14 +107,40 @@ export const AdminProvider = ({ children }) => {
                     const fetchedCats = categoriesRes.data.data.categories;
                     setCategories(prev => {
                         const merged = [...fetchedCats];
-                        const fetchedIds = new Set(fetchedCats.map(c => String(c.id)));
+                        const fetchedIds = new Set(fetchedCats.map(c => String(c.id).toLowerCase()));
+                        const fetchedNames = new Set(fetchedCats.map(c => c.name.toLowerCase()));
 
                         initialCategories.forEach(mockC => {
-                            if (!fetchedIds.has(String(mockC.id))) {
+                            const mId = String(mockC.id).toLowerCase();
+                            const mName = mockC.name.toLowerCase();
+
+                            const isIdPresent = fetchedIds.has(mId);
+                            const isNamePresent = fetchedNames.has(mName);
+                            const isSlugSimilar = fetchedCats.some(fc => {
+                                const s1 = String(fc.slug || '').toLowerCase();
+                                const s2 = mId;
+                                return s1 === s2 || (s1 && s2 && (s1.includes(s2) || s2.includes(s1)));
+                            });
+
+                            if (!isIdPresent && !isNamePresent && !isSlugSimilar) {
                                 merged.push(mockC);
                             }
                         });
-                        return merged;
+
+                        // FINAL PASS: Ensure absolute uniqueness by name for categories
+                        const finalUniqueCats = [];
+                        const seenCatNames = new Set();
+                        merged.forEach(c => {
+                            const n = (c.name || '').toLowerCase().trim();
+                            if (n && !seenCatNames.has(n)) {
+                                finalUniqueCats.push(c);
+                                seenCatNames.add(n);
+                            }
+                        });
+
+                        // Cache targets for next visit
+                        localStorage.setItem('app_categories', JSON.stringify(finalUniqueCats));
+                        return finalUniqueCats;
                     });
                 }
 
@@ -116,7 +148,6 @@ export const AdminProvider = ({ children }) => {
                 const servicesRes = await client.get('/services');
                 let fetchedServices = [];
                 if (servicesRes.data.data) {
-                    // Check array structure (Handle various backend response formats: direct array, docs pagination, or named key)
                     let rawServices = [];
                     const d = servicesRes.data.data;
 
@@ -132,19 +163,56 @@ export const AdminProvider = ({ children }) => {
 
                     // --- MERGE STRATEGY ---
                     // Combine Mock Services with Backend Services
-                    // Using ID as key. Backend IDs (Mongo) win.
                     setServices(prev => {
                         const merged = [...fetchedServices];
-                        const fetchedIds = new Set(fetchedServices.map(s => String(s.id)));
+                        const fetchedIds = new Set(fetchedServices.map(s => String(s.id).toLowerCase()));
 
-                        // Add mock services that are NOT yet in backend
+                        const normalize = (t) => t.toLowerCase()
+                            .replace(/[^a-z0-9]/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+
+                        const isSimilar = (t1, t2) => {
+                            const n1 = normalize(t1);
+                            const n2 = normalize(t2);
+                            if (n1 === n2 || n1.includes(n2) || n2.includes(n1)) return true;
+
+                            const stopWords = ['and', 'with', 'for', 'the', 'expert', 'general', 'service', 'check'];
+                            const words1 = n1.split(' ').filter(w => w.length >= 2 && !stopWords.includes(w));
+                            const words2 = n2.split(' ').filter(w => w.length >= 2 && !stopWords.includes(w));
+
+                            // Shared keywords (highest confidence)
+                            const keyWords = ['ac', 'plumbing', 'cleaning', 'electrical', 'electrician', 'carpentry', 'carpenter', 'pest', 'painting', 'shifting', 'transport', 'appliance', 'washing', 'fridge', 'refrigerator', 'mixer', 'tv', 'dth', 'inverter', 'geyser', 'fan', 'sofa', 'tank', 'laptop', 'water'];
+                            const common = words1.filter(w => words2.includes(w));
+
+                            const hasKeyWordMatch = common.some(w => keyWords.includes(w));
+                            return hasKeyWordMatch || common.length >= 2;
+                        };
+
+                        // Add mock services that are NOT yet in backend (check by ID and aggressive Similarity)
                         initialServices.forEach(mockS => {
-                            if (!fetchedIds.has(String(mockS.id))) {
+                            const isIdPresent = fetchedIds.has(String(mockS.id).toLowerCase());
+                            const isTitleSimilar = fetchedServices.some(fs => isSimilar(fs.title, mockS.title));
+
+                            if (!isIdPresent && !isTitleSimilar) {
                                 merged.push(mockS);
                             }
                         });
 
-                        return merged;
+                        // FINAL PASS: Ensure absolute uniqueness by title to satisfy "replace all at once"
+                        const finalUnique = [];
+                        const seenTitles = new Set();
+                        merged.forEach(s => {
+                            const n = normalize(s.title);
+                            if (!seenTitles.has(n)) {
+                                finalUnique.push(s);
+                                seenTitles.add(n);
+                            }
+                        });
+
+                        // Cache to localStorage for next visit
+                        localStorage.setItem('app_services', JSON.stringify(finalUnique));
+                        return finalUnique;
                     });
                 }
 

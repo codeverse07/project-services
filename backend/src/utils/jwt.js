@@ -14,8 +14,8 @@ const createSendToken = (user, statusCode, res) => {
             Date.now() + 30 * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        secure: true, // MUST BE TRUE FOR CROSS-DOMAIN
-        sameSite: 'none' // MUST BE NONE FOR CROSS-DOMAIN
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     };
 
     res.cookie('jwt', token, cookieOptions);

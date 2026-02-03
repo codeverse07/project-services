@@ -18,15 +18,15 @@ router.get('/:id', technicianController.getTechnician);
 // Protected routes (Management)
 router.use(authMiddleware.protect);
 
-router.post('/documents',
-    authMiddleware.restrictTo('TECHNICIAN'),
-    upload.fields([
-        { name: 'aadharCard', maxCount: 1 },
-        { name: 'panCard', maxCount: 1 },
-        { name: 'resume', maxCount: 1 }
-    ]),
-    technicianController.uploadDocuments
-);
+// router.post('/documents',
+//     authMiddleware.restrictTo('TECHNICIAN'),
+//     upload.fields([
+//         { name: 'aadharCard', maxCount: 1 },
+//         { name: 'panCard', maxCount: 1 },
+//         { name: 'resume', maxCount: 1 }
+//     ]),
+//     technicianController.uploadDocuments
+// );
 
 router.post(
     '/profile',

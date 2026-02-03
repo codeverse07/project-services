@@ -125,6 +125,18 @@ export const services = [
         isActive: true,
     },
     {
+        id: 33,
+        title: 'Cab Services',
+        category: 'transport',
+        rating: 4.9,
+        reviews: 0,
+        price: 0,
+        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=400',
+        description: 'On-demand cab services for local and outstation travel. Professional drivers.',
+        isActive: true,
+        isComingSoon: true
+    },
+    {
         id: 32,
         title: 'Full House Shifting',
         category: 'houseshifting',

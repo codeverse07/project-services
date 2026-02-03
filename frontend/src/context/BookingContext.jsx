@@ -57,6 +57,7 @@ export const BookingProvider = ({ children }) => {
             setIsLoading(true);
             try {
                 const res = await client.get('/bookings');
+                console.log('Bookings Fetch Response:', res.data); // DEBUG LOG
                 let rawBookings = [];
                 // Check response structure for JSend or direct array
                 if (res.data.data && Array.isArray(res.data.data)) {
@@ -70,7 +71,7 @@ export const BookingProvider = ({ children }) => {
                 setBookings(rawBookings.map(transformBooking));
 
             } catch (err) {
-                console.error("Failed to fetch bookings", err);
+                console.error("Failed to fetch bookings:", err.response?.data || err.message); // DEBUG LOG
             } finally {
                 setIsLoading(false);
             }

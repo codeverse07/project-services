@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Phone, Mail, MapPin, ChevronRight, LogOut, Settings, CreditCard, Heart, Wrench, Facebook, Twitter, Instagram, Check, MessageSquarePlus, Send, AlertCircle } from 'lucide-react';
+import { User, Phone, Mail, MapPin, ChevronRight, LogOut, Settings, CreditCard, Heart, Wrench, Facebook, Twitter, Instagram, Check, MessageSquarePlus, Send, AlertCircle, Calendar } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { useSound } from '../../context/SoundContext';
@@ -64,6 +64,7 @@ const ProfilePage = () => {
   };
 
   const menuItems = [
+    { icon: Calendar, label: 'My Bookings', path: '/bookings', color: 'text-violet-600 bg-violet-50 dark:bg-violet-500/10' },
     { icon: Heart, label: 'Saved Services', path: '/saved', color: 'text-rose-600 bg-rose-50 dark:bg-rose-500/10' },
     { icon: MapPin, label: 'My Addresses', path: '/addresses', color: 'text-blue-600 bg-blue-50 dark:bg-blue-500/10' },
     { icon: CreditCard, label: 'Payment Methods', path: '/payments', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10' },

@@ -18,6 +18,8 @@ import MobileHomePage from './MobileHomePage';
 import SplitText from '../../react-bit/SplitText';
 import TextType from '../../react-bit/TextType';
 import SupermanTechnician from '../../components/home/SupermanTechnician';
+import { motion, AnimatePresence } from 'framer-motion';
+import MobileServiceDetail from '../Services/MobileServiceDetail';
 
 
 const iconMap = {
@@ -48,10 +50,22 @@ const HomePage = () => {
   const { addBooking } = useBookings();
   const [selectedService, setSelectedService] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false);
 
   const handleBookClick = (service) => {
     setSelectedService(service);
-    setIsModalOpen(true);
+    if (window.innerWidth >= 768) {
+      // On desktop, merge details into booking flow
+      setIsMobileDetailOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleDetailsClick = (service) => {
+    setSelectedService(service);
+    // Open MobileServiceDetail even on desktop as a quick-view modal
+    setIsMobileDetailOpen(true);
   };
 
   const handleConfirmBooking = (bookingData) => {
@@ -179,6 +193,16 @@ const HomePage = () => {
     };
   }, []);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
       if (!overlayRef.current) return;
@@ -200,15 +224,17 @@ const HomePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  if (isMobile) {
+    return (
+      <AnimatePresence mode="wait">
+        <MobileHomePage key="mobile-home" />
+      </AnimatePresence>
+    );
+  }
+
   return (
     <>
-      {/* Mobile View */}
-      <div className="block md:hidden">
-        <MobileHomePage />
-      </div>
-
-      {/* Desktop View */}
-      <div className="hidden md:block relative min-h-screen">
+      <div className="relative min-h-screen">
         {/* Dynamic Background System */}
         <div className="fixed inset-0 bg-slate-50 z-0" />
         <div
@@ -393,7 +419,12 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {services.slice(0, 3).map((service) => (
-                <ServiceCard key={service.id} service={service} onBook={handleBookClick} />
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  onBook={handleBookClick}
+                  onDetails={handleDetailsClick}
+                />
               ))}
             </div>
           </section>
@@ -444,6 +475,15 @@ const HomePage = () => {
           service={selectedService}
           onConfirm={handleConfirmBooking}
         />
+
+        <AnimatePresence>
+          {isMobileDetailOpen && selectedService && (
+            <MobileServiceDetail
+              serviceId={selectedService.id}
+              onClose={() => setIsMobileDetailOpen(false)}
+            />
+          )}
+        </AnimatePresence>
       </div >
     </>
   );

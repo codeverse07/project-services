@@ -23,12 +23,13 @@ import AdminLoginPage from './pages/Admin/AdminLoginPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import CareersPage from './pages/Static/CareersPage';
 import ContactPage from './pages/Static/ContactPage';
+import TechnicianLoginPage from './pages/Auth/TechnicianLoginPage';
 import './App.css';
-import { WorkerProvider } from './context/WorkerContext';
-import PartnerLandingPage from './pages/BeAPartner/PartnerLandingPage';
-import WorkerRegisterPage from './pages/BeAPartner/WorkerRegisterPage';
-import WorkerOnboardingPage from './pages/BeAPartner/WorkerOnboardingPage';
-import WorkerDashboard from './pages/Worker/WorkerDashboard';
+import { TechnicianProvider } from './context/TechnicianContext';
+import TechnicianLandingPage from './pages/BeAPartner/TechnicianLandingPage';
+import TechnicianRegisterPage from './pages/BeAPartner/TechnicianRegisterPage';
+import TechnicianOnboardingPage from './pages/BeAPartner/TechnicianOnboardingPage';
+import TechnicianDashboard from './pages/Technician/TechnicianDashboard';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -80,14 +81,14 @@ function AnimatedRoutes() {
               <Route path="contact" element={<ContactPage />} />
             </Route>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/technician/login" element={<TechnicianLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
 
-            {/* Worker Routes */}
-            <Route path="/partner" element={<PartnerLandingPage />} />
-            <Route path="/partner/register" element={<WorkerRegisterPage />} />
-            <Route path="/worker/onboarding" element={<WorkerOnboardingPage />} />
-            <Route path="/worker/dashboard" element={<WorkerDashboard />} />
+            <Route path="/technician" element={<TechnicianLandingPage />} />
+            <Route path="/technician/register" element={<TechnicianRegisterPage />} />
+            <Route path="/technician/onboarding" element={<TechnicianOnboardingPage />} />
+            <Route path="/technician/dashboard" element={<TechnicianDashboard />} />
 
             {/* Isolated Admin Routes */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -108,7 +109,7 @@ function App() {
     <UserProvider>
       <BookingProvider>
         <AdminProvider>
-          <WorkerProvider>
+          <TechnicianProvider>
             <ThemeProvider>
               <SoundProvider>
                 <Router>
@@ -116,7 +117,7 @@ function App() {
                 </Router>
               </SoundProvider>
             </ThemeProvider>
-          </WorkerProvider>
+          </TechnicianProvider>
         </AdminProvider>
       </BookingProvider>
     </UserProvider>

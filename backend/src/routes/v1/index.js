@@ -3,7 +3,7 @@ const router = express.Router();
 
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
-const workerRoutes = require('./workerRoutes');
+const technicianRoutes = require('./technicianRoutes');
 const serviceRoutes = require('./serviceRoutes');
 const bookingRoutes = require('./bookingRoutes');
 const notificationRoutes = require('./notificationRoutes');
@@ -16,7 +16,7 @@ router.get('/health', (req, res) => {
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
-router.use('/workers', workerRoutes);
+router.use('/technicians', technicianRoutes);
 router.use('/services', serviceRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/notifications', notificationRoutes);

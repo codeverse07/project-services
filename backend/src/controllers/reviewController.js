@@ -29,7 +29,7 @@ exports.createReview = async (req, res, next) => {
             rating,
             booking: bookingId,
             customer: req.user.id,
-            worker: booking.worker
+            technician: booking.technician
         });
 
         res.status(201).json({
@@ -46,9 +46,9 @@ exports.createReview = async (req, res, next) => {
     }
 };
 
-exports.getWorkerReviews = async (req, res, next) => {
+exports.getTechnicianReviews = async (req, res, next) => {
     try {
-        const reviews = await Review.find({ worker: req.params.workerId })
+        const reviews = await Review.find({ technician: req.params.technicianId })
             .populate('customer', 'name profilePhoto')
             .sort('-createdAt');
 

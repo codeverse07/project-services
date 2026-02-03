@@ -21,12 +21,12 @@ const storage = multer.diskStorage({
     }
 });
 
-// File Filter (Images Only)
+// File Filter (Images and PDFs Only)
 const multerFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image')) {
+    if (file.mimetype.startsWith('image') || file.mimetype === 'application/pdf') {
         cb(null, true);
     } else {
-        cb(new AppError('Not an image! Please upload only images.', 400), false);
+        cb(new AppError('Invalid file type! Please upload only images or PDFs.', 400), false);
     }
 };
 

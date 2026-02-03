@@ -14,7 +14,7 @@ router.use('/:bookingId/reviews', reviewRouter);
 router.use(protect);
 
 // Stats route (MUST be before /:bookingId)
-router.get('/stats', restrictTo('WORKER'), bookingController.getWorkerStats);
+router.get('/stats', restrictTo('TECHNICIAN'), bookingController.getTechnicianStats);
 
 router
     .route('/')

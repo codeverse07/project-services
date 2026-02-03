@@ -3,34 +3,34 @@ import client from '../api/client';
 import { useUser } from './UserContext';
 import { toast } from 'react-hot-toast';
 
-const WorkerContext = createContext();
+const TechnicianContext = createContext();
 
-export const useWorker = () => useContext(WorkerContext);
+export const useTechnician = () => useContext(TechnicianContext);
 
-export const WorkerProvider = ({ children }) => {
+export const TechnicianProvider = ({ children }) => {
     const { user, isAuthenticated } = useUser();
-    const [workerProfile, setWorkerProfile] = useState(null);
+    const [technicianProfile, setTechnicianProfile] = useState(null);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [jobs, setJobs] = useState([]);
 
-    // Fetch Worker Profile if user is a WORKER
+    // Fetch Technician Profile if user is a TECHNICIAN
     useEffect(() => {
-        const fetchWorkerData = async () => {
-            if (isAuthenticated && user?.role === 'WORKER') {
+        const fetchTechnicianData = async () => {
+            if (isAuthenticated && user?.role === 'TECHNICIAN') {
                 try {
                     setLoading(true);
-                    // Fetch worker profile by User ID (Backend allows filtering by user field)
-                    const res = await client.get(`/workers?user=${user._id}`);
+                    // Fetch technician profile by User ID (Backend allows filtering by user field)
+                    const res = await client.get(`/technicians?user=${user._id}`);
 
-                    if (res.data.status === 'success' && res.data.data.workers.length > 0) {
-                        setWorkerProfile(res.data.data.workers[0]);
+                    if (res.data.status === 'success' && res.data.data.technicians.length > 0) {
+                        setTechnicianProfile(res.data.data.technicians[0]);
                     } else {
-                        // Profile doesn't exist yet (New registered worker)
-                        setWorkerProfile(null);
+                        // Profile doesn't exist yet (New registered technician)
+                        setTechnicianProfile(null);
                     }
                 } catch (error) {
-                    console.error("Error fetching worker data", error);
+                    console.error("Error fetching technician data", error);
                 } finally {
                     setLoading(false);
                 }
@@ -39,7 +39,7 @@ export const WorkerProvider = ({ children }) => {
             }
         };
 
-        fetchWorkerData();
+        fetchTechnicianData();
     }, [isAuthenticated, user]);
 
     const createProfile = async (profileData) => {
@@ -67,11 +67,19 @@ export const WorkerProvider = ({ children }) => {
                 formData.append('profilePhoto', profileData.profilePhoto);
             }
 
-            const res = await client.post('/workers/profile', formData, {
+            // Append documents
+            if (profileData.documents) {
+                if (profileData.documents.aadharCard) formData.append('aadharCard', profileData.documents.aadharCard);
+                if (profileData.documents.panCard) formData.append('panCard', profileData.documents.panCard);
+                if (profileData.documents.drivingLicense) formData.append('drivingLicense', profileData.documents.drivingLicense);
+                if (profileData.documents.certificates) formData.append('certificates', profileData.documents.certificates);
+            }
+
+            const res = await client.post('/technicians/profile', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
-            setWorkerProfile(res.data.data.profile);
+            setTechnicianProfile(res.data.data.profile);
             toast.success("Profile created successfully!");
             return { success: true };
         } catch (error) {
@@ -83,21 +91,39 @@ export const WorkerProvider = ({ children }) => {
 
     const updateStatus = async (isOnline) => {
         try {
-            const res = await client.patch('/workers/profile', { isOnline });
-            setWorkerProfile(prev => ({ ...prev, isOnline: res.data.data.profile.isOnline }));
+            const res = await client.patch('/technicians/profile', { isOnline });
+            setTechnicianProfile(prev => ({ ...prev, isOnline: res.data.data.profile.isOnline }));
             toast.success(isOnline ? "You are now Online" : "You are now Offline");
         } catch (error) {
             toast.error("Failed to update status");
         }
     };
 
+    const subscribeToPush = async () => {
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'BB40pUEc2e28ijP0qTRgDsAgxZufLdUNoPAfnGZHIYW6WgAXt0eWTNKBhEK9cZfkXnh7swDxQQjxbM_LKuLLWeo'
+                });
+
+                await client.post('/technicians/subscribe', subscription);
+                console.log("Push subscription successful");
+            } catch (error) {
+                console.error("Push subscription failed", error);
+            }
+        }
+    };
+
     const value = {
-        workerProfile,
+        technicianProfile,
         loading,
         createProfile,
         updateStatus,
+        subscribeToPush,
         jobs
     };
 
-    return <WorkerContext.Provider value={value}>{children}</WorkerContext.Provider>;
+    return <TechnicianContext.Provider value={value}>{children}</TechnicianContext.Provider>;
 };

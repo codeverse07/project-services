@@ -26,7 +26,7 @@ const workerUser = {
     email: `worker_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const customerUser = {
@@ -72,7 +72,7 @@ async function runTest() {
             skills: ["Plumbing"],
             location: { type: "Point", coordinates: [77.5946, 12.9716] }
         });
-        log('Worker Profile Created');
+        log('Technician Profile Created');
 
         // Create Service
         const serviceRes = await workerClient.post('/services', serviceData);

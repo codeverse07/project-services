@@ -18,7 +18,7 @@ const workerUser = {
     email: `worker_notif_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const serviceData = { title: "Expensive Service", description: "Test", price: 500, category: "Plumbing" };
@@ -55,7 +55,7 @@ async function runTest() {
         }
 
         // 3. Notification Persistence Test (Worker Side)
-        // Creating a booking should trigger a notification to the WORKER
+        // Creating a booking should trigger a notification to the TECHNICIAN
         log('Test 2: Notification Persistence (Worker)');
 
         const notifRes = await workerClient.get('/notifications');

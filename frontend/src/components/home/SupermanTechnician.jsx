@@ -4,7 +4,7 @@ import frame1 from '../../assets/supermanframe1.png';
 import frame2 from '../../assets/supermanframe2.png';
 import frame3 from '../../assets/supermanframe3.png';
 
-const SupermanWorker = forwardRef(({ className = "" }, ref) => {
+const SupermanTechnician = forwardRef(({ className = "" }, ref) => {
     return (
         <div ref={ref} className={`relative w-full h-full ${className}`}>
             {/* 
@@ -28,4 +28,4 @@ const SupermanWorker = forwardRef(({ className = "" }, ref) => {
     );
 });
 
-export default SupermanWorker;
+export default SupermanTechnician;

@@ -148,11 +148,11 @@ export const AdminProvider = ({ children }) => {
                     });
                 }
 
-                // Fetch Workers (Technicians)
-                const workersRes = await client.get('/admin/workers');
-                if (workersRes.data.data) {
-                    const rawWorkers = workersRes.data.data.workers || [];
-                    setTechnicians(rawWorkers);
+                // Fetch Technicians (Technicians)
+                const techniciansRes = await client.get('/admin/technicians');
+                if (techniciansRes.data.data) {
+                    const rawTechnicians = techniciansRes.data.data.technicians || [];
+                    setTechnicians(rawTechnicians);
                 }
 
                 // Fetch Feedbacks
@@ -243,24 +243,24 @@ export const AdminProvider = ({ children }) => {
                 category: serviceData.category,
                 price: Number(serviceData.price),
                 description: serviceData.description || 'No description',
-                worker: isAdminAuthenticated ? '653a1...dummy' : null, // Admin creating service? Service must belong to a worker. Backend restriction.
-                // Wait, serviceSchema says 'worker' required.
-                // If ADMIN creates service, who is the worker?
-                // Realistically, Admin assigns a worker or creates a "Generic" service?
-                // Backend might require a Valid Worker ID.
-                // For now, I'll omit Worker and see if backend fails (if I'm Admin, maybe I can override?).
-                // Actually checking serviceModel.js: worker required.
-                // Admin dashboard creation flow might need to selecting a worker?
-                // The UI doesn't show worker selection for "New Service Card".
-                // This is a disconnect. I'll use the first available technician ID as a fallback or current user if they are a worker.
+                technician: isAdminAuthenticated ? '653a1...dummy' : null, // Admin creating service? Service must belong to a technician. Backend restriction.
+                // Wait, serviceSchema says 'technician' required.
+                // If ADMIN creates service, who is the technician?
+                // Realistically, Admin assigns a technician or creates a "Generic" service?
+                // Backend might require a Valid Technician ID.
+                // For now, I'll omit Technician and see if backend fails (if I'm Admin, maybe I can override?).
+                // Actually checking serviceModel.js: technician required.
+                // Admin dashboard creation flow might need to selecting a technician?
+                // The UI doesn't show technician selection for "New Service Card".
+                // This is a disconnect. I'll use the first available technician ID as a fallback or current user if they are a technician.
             };
 
-            // If we are ADMIN, we need to assign a worker.
+            // If we are ADMIN, we need to assign a technician.
             // Let's grab the first technician from state.
             if (technicians.length > 0) {
-                payload.worker = technicians[0]._id || technicians[0].id;
+                payload.technician = technicians[0]._id || technicians[0].id;
             } else {
-                console.error("Cannot create service without a worker available.");
+                console.error("Cannot create service without a technician available.");
                 return;
             }
 
@@ -342,16 +342,16 @@ export const AdminProvider = ({ children }) => {
                 skills: techData.skills ? techData.skills.split(',').map(s => s.trim()) : []
             };
 
-            const res = await client.post('/admin/workers', payload);
+            const res = await client.post('/admin/technicians', payload);
             if (res.data.status === 'success') {
-                // Add new worker to local state
+                // Add new technician to local state
                 // Note: Response structure is { user, profile }
-                // We might need to fetch all again or verify shape matches 'workers' list
-                // Workers list usually expects profile with populated user...
+                // We might need to fetch all again or verify shape matches 'technicians' list
+                // Technicians list usually expects profile with populated user...
                 // Ideally we just refetch or manually construct the shape
-                const newWorker = res.data.data.profile;
-                newWorker.user = res.data.data.user; // Manually populate for UI
-                setTechnicians(prev => [newWorker, ...prev]);
+                const newTechnician = res.data.data.profile;
+                newTechnician.user = res.data.data.user; // Manually populate for UI
+                setTechnicians(prev => [newTechnician, ...prev]);
             }
         } catch (err) {
             console.error("Failed to add technician", err);

@@ -12,7 +12,7 @@ const workerUser = {
     email: `wf_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const customerUser = {
@@ -107,7 +107,7 @@ async function runTest() {
             throw new Error(`FAILURE: Earnings mismatch. Got ${JSON.stringify(stats)}`);
         }
 
-        log('WORKER FEATURES VERIFIED SUCCESSFULLY!');
+        log('TECHNICIAN FEATURES VERIFIED SUCCESSFULLY!');
 
     } catch (error) {
         if (error.code === 'ECONNREFUSED') {

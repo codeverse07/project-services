@@ -17,7 +17,7 @@ import promoImg from '../../assets/images/fridge-repair.png';
 import MobileHomePage from './MobileHomePage';
 import SplitText from '../../react-bit/SplitText';
 import TextType from '../../react-bit/TextType';
-import SupermanWorker from '../../components/home/SupermanWorker';
+import SupermanTechnician from '../../components/home/SupermanTechnician';
 
 
 const iconMap = {
@@ -243,9 +243,9 @@ const HomePage = () => {
               <div className="absolute bottom-0 left-1/2 w-64 h-64 bg-slate-600 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
             </div>
 
-            {/* Superman Worker - Moved outside the text container for full-width positioning */}
+            {/* Superman Technician - Moved outside the text container for full-width positioning */}
             <div className="superman-container absolute left-[2%] md:left-[5%] lg:left-[10%] top-32 md:top-48 w-80 lg:w-96 h-[28rem] lg:h-[32rem] z-20 hidden md:block pointer-events-none">
-              <SupermanWorker />
+              <SupermanTechnician />
             </div>
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

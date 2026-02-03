@@ -3,12 +3,18 @@ const Joi = require('joi');
 const createProfile = {
     body: Joi.object().keys({
         bio: Joi.string().max(500),
-        skills: Joi.array().items(Joi.string().trim()).min(1).single().required(),
+        skills: Joi.array().items(Joi.string().trim()).min(1).max(2).single().required(),
         profilePhoto: Joi.string(),
         location: Joi.object().keys({
             type: Joi.string().valid('Point').default('Point'),
             coordinates: Joi.array().items(Joi.number()).length(2).required(),
             address: Joi.string()
+        }),
+        documents: Joi.object().keys({
+            aadharCard: Joi.string(),
+            panCard: Joi.string(),
+            drivingLicense: Joi.string(),
+            certificates: Joi.array().items(Joi.string())
         })
     }),
 };
@@ -27,13 +33,14 @@ const updateProfile = {
         documents: Joi.object().keys({
             aadharCard: Joi.string(),
             panCard: Joi.string(),
-            resume: Joi.string(),
+            drivingLicense: Joi.string(),
+            certificates: Joi.array().items(Joi.string()),
             verificationStatus: Joi.string().valid('PENDING', 'VERIFIED', 'REJECTED')
         })
     }).min(1),
 };
 
-const getWorkers = {
+const getTechnicians = {
     query: Joi.object().keys({
         skills: Joi.string(), // Comma separated
         rating: Joi.number().min(0).max(5),
@@ -46,5 +53,5 @@ const getWorkers = {
 module.exports = {
     createProfile,
     updateProfile,
-    getWorkers,
+    getTechnicians,
 };

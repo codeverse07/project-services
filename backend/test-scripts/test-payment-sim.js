@@ -10,7 +10,7 @@ const workerUser = {
     email: `payee_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const payerUser = {

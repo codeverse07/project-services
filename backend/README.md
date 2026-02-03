@@ -41,7 +41,7 @@ All API routes are prefixed with `/api/v1`.
 ### 🔐 Authentication (`/auth`)
 | Method | Endpoint | Description | Auth |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/register` | Register a new user (`role`: 'USER' or 'WORKER') | Public |
+| `POST` | `/register` | Register a new user (`role`: 'USER' or 'TECHNICIAN') | Public |
 | `POST` | `/login` | Login and receive JWT token | Public |
 | `POST` | `/logout` | Logout (Clear cookie) | Public |
 | `GET` | `/me` | Get current logged-in user details | **Private** |

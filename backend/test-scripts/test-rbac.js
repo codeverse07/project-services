@@ -52,14 +52,14 @@ async function runTest() {
             }
         }
 
-        // 4. Attempt to Create Worker Profile (Should Fail)
-        log('Attempting to create Worker Profile (Worker Only)...');
+        // 4. Attempt to Create Technician Profile (Should Fail)
+        log('Attempting to create Technician Profile (Worker Only)...');
         try {
             await client.post('/workers/profile', { bio: "Hacker" });
-            throw new Error('FAILURE: USER was allowed to create a Worker Profile!');
+            throw new Error('FAILURE: USER was allowed to create a Technician Profile!');
         } catch (error) {
             if (error.response && error.response.status === 403) {
-                log('SUCCESS: Worker Profile creation blocked (403 Forbidden)');
+                log('SUCCESS: Technician Profile creation blocked (403 Forbidden)');
             } else {
                 throw new Error(`FAILURE: Expected 403, got ${error.response ? error.response.status : error.message}`);
             }

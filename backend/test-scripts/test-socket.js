@@ -17,7 +17,7 @@ const workerUser = {
     email: `socket_worker_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const customerUser = {

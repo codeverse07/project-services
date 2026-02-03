@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 console.log('1. Loading Models...');
 try {
     require('../src/models/User');
-    require('../src/models/WorkerProfile');
+    require('../src/models/TechnicianProfile');
     require('../src/models/Service');
     require('../src/models/Booking');
     require('../src/models/Notification');

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const WorkerProfile = require('./WorkerProfile');
+const TechnicianProfile = require('./TechnicianProfile');
 
 const reviewSchema = new mongoose.Schema({
     review: {
@@ -56,7 +56,7 @@ reviewSchema.statics.calcAverageRatings = async function (workerUserId) {
     ]);
 
     if (stats.length > 0) {
-        await WorkerProfile.findOneAndUpdate(
+        await TechnicianProfile.findOneAndUpdate(
             { user: workerUserId },
             {
                 avgRating: Math.round(stats[0].avgRating * 10) / 10,
@@ -64,7 +64,7 @@ reviewSchema.statics.calcAverageRatings = async function (workerUserId) {
             }
         );
     } else {
-        await WorkerProfile.findOneAndUpdate(
+        await TechnicianProfile.findOneAndUpdate(
             { user: workerUserId },
             {
                 avgRating: 4.5, // Default? or 0

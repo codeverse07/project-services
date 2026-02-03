@@ -20,7 +20,7 @@ async function runTest() {
             email: WORKER_EMAIL,
             password: TEST_PASSWORD,
             passwordConfirm: TEST_PASSWORD,
-            role: 'WORKER'
+            role: 'TECHNICIAN'
         });
         console.log('✅ Worker Registered');
 

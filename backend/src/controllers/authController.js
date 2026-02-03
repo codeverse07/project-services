@@ -14,7 +14,7 @@ exports.register = async (req, res, next) => {
 
             passwordConfirm: req.body.passwordConfirm,
             phone: req.body.phone,
-            role: req.body.role || 'USER' // Validation layer ensures only USER/WORKER
+            role: req.body.role || 'USER' // Validation layer ensures only USER/TECHNICIAN
         });
 
         createSendToken(newUser, 201, res);

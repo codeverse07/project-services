@@ -5,7 +5,7 @@ const validate = require('../../utils/validate');
 const reviewValidation = require('../../validations/review.validation');
 
 // mergeParams: true allows us to access parameters from parent routers 
-// (e.g. /bookings/:bookingId/reviews and /workers/:workerId/reviews)
+// (e.g. /bookings/:bookingId/reviews and /technicians/:technicianId/reviews)
 const router = express.Router({ mergeParams: true });
 
 // Protect all routes
@@ -18,6 +18,6 @@ router
         validate(reviewValidation.createReview),
         reviewController.createReview
     )
-    .get(reviewController.getWorkerReviews);
+    .get(reviewController.getTechnicianReviews);
 
 module.exports = router;

@@ -5,7 +5,7 @@ import { CheckCircle, TrendingUp, Clock, Shield, ArrowRight } from 'lucide-react
 import MobileHeader from '../../components/mobile/MobileHeader'; // Reuse existing header
 // import Footer from '../../components/common/Footer'; // If exists, or just use bottom nav/simple footer
 
-const PartnerLandingPage = () => {
+const TechnicianLandingPage = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-slate-950 font-sans">
             <MobileHeader />
@@ -21,7 +21,7 @@ const PartnerLandingPage = () => {
                         transition={{ duration: 0.6 }}
                     >
                         <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-wider mb-6">
-                            Join Reservice Partners
+                            Join Reservice Technicians
                         </span>
                         <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
                             Grow Your Business <br />
@@ -36,16 +36,16 @@ const PartnerLandingPage = () => {
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                             <Link
-                                to="/partner/register"
+                                to="/technician/register"
                                 className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
                             >
-                                Become a Partner <ArrowRight className="w-5 h-5" />
+                                Become a Technician <ArrowRight className="w-5 h-5" />
                             </Link>
                             <Link
-                                to="/login"
+                                to="/technician/login"
                                 className="text-slate-600 dark:text-slate-400 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             >
-                                Already a partner? Sign In
+                                Already a technician? Sign In
                             </Link>
                         </div>
                     </motion.div>
@@ -56,7 +56,7 @@ const PartnerLandingPage = () => {
             <section className="py-10 border-y border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                 <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                     {[
-                        { label: "Active Partners", value: "2,000+" },
+                        { label: "Active Technicians", value: "2,000+" },
                         { label: "Jobs Completed", value: "50k+" },
                         { label: "Average Earnings", value: "₹35k/mo" },
                         { label: "Cities", value: "12+" }
@@ -76,7 +76,7 @@ const PartnerLandingPage = () => {
                         {[
                             { icon: TrendingUp, title: "Zero Commission Period", desc: "Keep 100% of your earnings for the first 30 days. Transparent pricing afterwards." },
                             { icon: Clock, title: "Flexible Schedule", desc: "You are the boss. Go online when you want to work, go offline when you need a break." },
-                            { icon: Shield, title: "Insurance Cover", desc: "Accidental insurance coverage up to ₹5 Lakhs for all verified partners on active jobs." },
+                            { icon: Shield, title: "Insurance Cover", desc: "Accidental insurance coverage up to ₹5 Lakhs for all verified technicians on active jobs." },
                         ].map((item, i) => (
                             <motion.div
                                 key={i}
@@ -131,10 +131,10 @@ const PartnerLandingPage = () => {
                     </p>
 
                     <Link
-                        to="/partner/register"
+                        to="/technician/register"
                         className="inline-block bg-white text-blue-600 px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-blue-50 transition-colors relative z-10"
                     >
-                        Register as Partner
+                        Register as Technician
                     </Link>
                 </div>
             </section>
@@ -143,4 +143,4 @@ const PartnerLandingPage = () => {
     );
 };
 
-export default PartnerLandingPage;
+export default TechnicianLandingPage;

@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema({
     },
     worker: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User' // Keeping it User (role WORKER) for flexibility, or WorkerProfile? User usually better for financial linking
+        ref: 'User' // Keeping it User (role TECHNICIAN) for flexibility, or TechnicianProfile? User usually better for financial linking
     },
     booking: {
         type: mongoose.Schema.Types.ObjectId,

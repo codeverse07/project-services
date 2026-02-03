@@ -18,7 +18,7 @@ const workerUser = {
     email: `worker_feat_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const serviceData = { title: "Feature Service", description: "Test", price: 100, category: "Plumbing" };

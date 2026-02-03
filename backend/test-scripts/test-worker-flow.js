@@ -11,21 +11,21 @@ const TEST_PASSWORD = 'password123';
 
 async function runTest() {
     try {
-        console.log('--- STARTING WORKER FLOW TEST ---');
+        console.log('--- STARTING TECHNICIAN FLOW TEST ---');
 
-        // 1. Register as WORKER
+        // 1. Register as TECHNICIAN
         console.log(`1. Registering worker: ${TEST_EMAIL}`);
         const regRes = await client.post('/auth/register', {
             name: 'Test Worker',
             email: TEST_EMAIL,
             password: TEST_PASSWORD,
             passwordConfirm: TEST_PASSWORD,
-            role: 'WORKER'
+            role: 'TECHNICIAN'
         });
         console.log('✅ Register Success:', regRes.data.status);
 
         // 2. Create Profile
-        console.log('2. Creating Worker Profile...');
+        console.log('2. Creating Technician Profile...');
         const profileRes = await client.post('/workers/profile', {
             bio: 'I am a skilled plumber.',
             skills: ['Plumbing', 'Pipe Fixing'],

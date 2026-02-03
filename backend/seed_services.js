@@ -13,7 +13,7 @@ const seedServices = async () => {
 
         // 1. Find or Create a Worker
         console.log('Looking for a Worker...');
-        let worker = await User.findOne({ role: 'WORKER' });
+        let worker = await User.findOne({ role: 'TECHNICIAN' });
 
         if (!worker) {
             console.log('No worker found. Creating a Seed Worker...');
@@ -23,7 +23,7 @@ const seedServices = async () => {
                 password: 'password123',
                 passwordConfirm: 'password123',
                 phone: '1112223333',
-                role: 'WORKER'
+                role: 'TECHNICIAN'
             });
             console.log('Seed Worker created:', worker._id);
         } else {

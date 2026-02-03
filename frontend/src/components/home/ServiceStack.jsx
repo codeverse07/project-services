@@ -2,7 +2,7 @@ import React, { useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { categories } from '../../data/mockData';
-import WorkerCharacter from './WorkerCharacter';
+import TechnicianCharacter from './TechnicianCharacter';
 import { Hammer, Zap, Refrigerator, Droplets, Truck, Home } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -18,7 +18,7 @@ const iconMap = {
 
 const ServiceStack = () => {
     const containerRef = useRef(null);
-    const workerRef = useRef(null);
+    const technicianRef = useRef(null);
     const [activeCardId, setActiveCardId] = useState(categories[0].id);
 
 
@@ -26,17 +26,17 @@ const ServiceStack = () => {
         const ctx = gsap.context(() => {
             const cards = gsap.utils.toArray('.service-card');
 
-            // Initial Worker State: Hidden and pushed down
-            gsap.set(workerRef.current, { y: 100, opacity: 0 });
+            // Initial Technician State: Hidden and pushed down
+            gsap.set(technicianRef.current, { y: 100, opacity: 0 });
 
-            // Worker Entrance Animation
+            // Technician Entrance Animation
             // Trigger when the first card hits the sticky position (top-60 = 240px)
             ScrollTrigger.create({
                 trigger: cards[0], // Monitor the first card
                 start: "top 240px", // When card top hits 240px from viewport top
                 end: "bottom center", // Keep it active (or manage exit separately)
                 onEnter: () => {
-                    gsap.to(workerRef.current, {
+                    gsap.to(technicianRef.current, {
                         y: 0,
                         opacity: 1,
                         duration: 0.6,
@@ -45,7 +45,7 @@ const ServiceStack = () => {
                     });
                 },
                 onLeaveBack: () => {
-                    gsap.to(workerRef.current, {
+                    gsap.to(technicianRef.current, {
                         y: 100,
                         opacity: 0,
                         duration: 0.4,
@@ -55,7 +55,7 @@ const ServiceStack = () => {
                 }
             });
 
-            // Worker Exit Animation
+            // Technician Exit Animation
             // Trigger start descent specifically from the 4th card (index 3) as requested
             if (cards.length > 3) {
                 ScrollTrigger.create({
@@ -63,7 +63,7 @@ const ServiceStack = () => {
                     start: "top 75%", // Start EARLIER (as card enters bottom of screen)
                     end: "bottom top",
                     scrub: 0.5, // Slight smoothing for physics feel
-                    animation: gsap.to(workerRef.current, {
+                    animation: gsap.to(technicianRef.current, {
                         y: 1200, // Faster/Deeper drop
                         scale: 0.8, // Fall "away" slightly
                         opacity: 0,
@@ -77,7 +77,7 @@ const ServiceStack = () => {
                     start: "bottom 85%",
                     end: "bottom 50%",
                     scrub: 1,
-                    animation: gsap.to(workerRef.current, {
+                    animation: gsap.to(technicianRef.current, {
                         y: 150,
                         opacity: 0,
                         ease: "power1.in"
@@ -111,17 +111,17 @@ const ServiceStack = () => {
 
             {/* Stack Container */}
             <div className="max-w-4xl mx-auto relative pb-10">
-                {/* Worker Sticky Container */}
+                {/* Technician Sticky Container */}
                 {/* 
                     Cards are sticky top-60 (240px). 
-                    Worker was -top-[174px] relative to card.
-                    So Worker top should be 240px - 174px = 66px.
+                    Technician was -top-[174px] relative to card.
+                    So Technician top should be 240px - 174px = 66px.
                     We use a zero-height container so it doesn't affect flow, 
-                    but allows the worker to 'sit' there.
+                    but allows the technician to 'sit' there.
                 */}
                 <div className="sticky top-[68px] z-0 h-0 w-full pointer-events-none mb-0">
-                    <div ref={workerRef} className="absolute left-1/2 -translate-x-1/2 -top-24 w-[400px] transform">
-                        <WorkerCharacter pose="holding" mood="happy" className="drop-shadow-2xl" />
+                    <div ref={technicianRef} className="absolute left-1/2 -translate-x-1/2 -top-24 w-[400px] transform">
+                        <TechnicianCharacter pose="holding" mood="happy" className="drop-shadow-2xl" />
                     </div>
                 </div>
 
@@ -191,7 +191,7 @@ const ServiceStack = () => {
                 })}
             </div>
 
-            {/* "Curtain" to physically cover the worker if he lingers */}
+            {/* "Curtain" to physically cover the technician if he lingers */}
             <div className="relative w-full h-80 rounded-4xl bg-slate-800 z-10 -mt-40 pointer-events-none"></div>
         </div>
     );

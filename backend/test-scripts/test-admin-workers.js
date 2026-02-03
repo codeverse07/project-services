@@ -46,7 +46,7 @@ async function runTest() {
             }
         }
 
-        log('ADMIN WORKER MANAGEMENT VERIFIED SUCCESSFULLY!');
+        log('ADMIN TECHNICIAN MANAGEMENT VERIFIED SUCCESSFULLY!');
 
     } catch (error) {
         if (error.code === 'ECONNREFUSED') {

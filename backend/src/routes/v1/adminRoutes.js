@@ -14,11 +14,11 @@ router.get('/dashboard-stats', adminController.getDashboardStats);
 router.get('/users', adminController.getAllUsers);
 router.patch('/users/:id/status', adminController.toggleUserStatus); // Body: { isActive: boolean }
 
-// --- WORKER MANAGEMENT ---
-router.get('/workers', adminController.getAllWorkers);
-router.patch('/workers/:id/approve', adminController.approveWorker);
-router.patch('/workers/:id/reject', adminController.rejectWorker);
-router.post('/workers', adminController.createWorker);
+// --- TECHNICIAN MANAGEMENT ---
+router.get('/technicians', adminController.getAllTechnicians);
+router.patch('/technicians/:id/approve', adminController.approveTechnician);
+router.patch('/technicians/:id/reject', adminController.rejectTechnician);
+router.post('/technicians', adminController.createTechnician);
 
 // --- SERVICE MANAGEMENT ---
 router.get('/services', adminController.getAllServices);

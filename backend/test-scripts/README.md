@@ -9,7 +9,7 @@ Run any script using `node test-scripts/<script-name>.js`. Ensure the server is 
 
 ### Core Verification
 - **`test-server.js`**: Basic connectivity test.
-- **`test-upload.js`**: Verifies image upload functionality (Worker Profile).
+- **`test-upload.js`**: Verifies image upload functionality (Technician Profile).
 - **`test-booking-flow.js`**: Simulates User booking a Service, Worker accepting it, and status updates.
 
 ### Admin Panel

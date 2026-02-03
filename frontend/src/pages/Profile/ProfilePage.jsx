@@ -463,7 +463,6 @@ const ProfilePage = () => {
               <ul className="space-y-3">
                 <li><Link to="/contact" className="text-slate-600 dark:text-slate-400 font-medium">About Us</Link></li>
                 <li><Link to="/services" className="text-slate-600 dark:text-slate-400 font-medium">Our Services</Link></li>
-                <li><Link to="/partner" className="text-blue-600 dark:text-blue-400 font-bold hover:underline">Become a Partner</Link></li>
                 <li>
                   <Link to="/careers" className="text-slate-600 dark:text-slate-400 font-medium hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2">
                     Careers

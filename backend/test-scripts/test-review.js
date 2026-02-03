@@ -16,7 +16,7 @@ const workerUser = {
     email: `review_worker_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 const customerUser = {
@@ -49,7 +49,7 @@ async function runTest() {
             skills: ["Cleaning"],
             location: { type: "Point", coordinates: [0, 0] }
         });
-        const workerProfileId = profileRes.data.data.profile.id || profileRes.data.data.profile._id;
+        const technicianProfileId = profileRes.data.data.profile.id || profileRes.data.data.profile._id;
 
         const svcRes = await workerClient.post('/services', serviceData);
         const serviceId = svcRes.data.data.service._id;
@@ -116,8 +116,8 @@ async function runTest() {
         }
 
         // 7. Verify Worker Rating
-        const workerProfileRes = await customerClient.get(`/workers/${workerProfileId}`);
-        const avgRating = workerProfileRes.data.data.worker.avgRating;
+        const technicianProfileRes = await customerClient.get(`/workers/${technicianProfileId}`);
+        const avgRating = technicianProfileRes.data.data.worker.avgRating;
 
         if (avgRating === 5) {
             log('SUCCESS: Worker avgRating updated to 5');

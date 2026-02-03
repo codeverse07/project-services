@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const WorkerProfile = require('../models/WorkerProfile');
+const TechnicianProfile = require('../models/TechnicianProfile');
 const Service = require('../models/Service');
 const Booking = require('../models/Booking');
 const AppError = require('../utils/AppError');
@@ -10,19 +10,19 @@ exports.getDashboardStats = async (req, res, next) => {
         // Run aggregation queries in parallel for performance
         const [
             totalUsers,
-            totalWorkers,
-            activeWorkers,
+            totalTechnicians,
+            activeTechnicians,
             totalServices,
             totalBookings,
             pendingApprovals,
             todaysBookings
         ] = await Promise.all([
             User.countDocuments({ role: 'USER' }), // Only count regular users? Or all? Let's count regular users.
-            User.countDocuments({ role: 'WORKER' }),
-            WorkerProfile.countDocuments({ isOnline: true }),
+            User.countDocuments({ role: 'TECHNICIAN' }),
+            TechnicianProfile.countDocuments({ isOnline: true }),
             Service.countDocuments(),
             Booking.countDocuments(),
-            WorkerProfile.countDocuments({ 'documents.verificationStatus': 'PENDING' }),
+            TechnicianProfile.countDocuments({ 'documents.verificationStatus': 'PENDING' }),
             Booking.countDocuments({
                 scheduledAt: {
                     $gte: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -35,8 +35,8 @@ exports.getDashboardStats = async (req, res, next) => {
             status: 'success',
             data: {
                 totalUsers,
-                totalWorkers,
-                activeWorkers,
+                totalTechnicians,
+                activeTechnicians,
                 totalServices,
                 totalBookings,
                 pendingApprovals,
@@ -49,7 +49,7 @@ exports.getDashboardStats = async (req, res, next) => {
     }
 };
 
-exports.getAllWorkers = async (req, res, next) => {
+exports.getAllTechnicians = async (req, res, next) => {
     try {
         const { status, limit, page } = req.query;
         const filter = {};
@@ -58,61 +58,61 @@ exports.getAllWorkers = async (req, res, next) => {
             filter['documents.verificationStatus'] = status.toUpperCase();
         }
 
-        const workers = await WorkerProfile.find(filter)
+        const technicians = await TechnicianProfile.find(filter)
             .populate('user', 'name email phone isActive') // Important: See user details
             .sort('-createdAt'); // Newest first
 
         res.status(200).json({
             status: 'success',
-            results: workers.length,
-            data: { workers }
+            results: technicians.length,
+            data: { technicians }
         });
     } catch (error) {
         next(error);
     }
 };
 
-exports.approveWorker = async (req, res, next) => {
+exports.approveTechnician = async (req, res, next) => {
     try {
-        const worker = await WorkerProfile.findById(req.params.id);
-        if (!worker) return next(new AppError('Worker not found', 404));
+        const technician = await TechnicianProfile.findById(req.params.id);
+        if (!technician) return next(new AppError('Technician not found', 404));
 
-        worker.documents.verificationStatus = 'VERIFIED';
-        await worker.save();
+        technician.documents.verificationStatus = 'VERIFIED';
+        await technician.save();
 
         // LOG ACTION
         await adminService.logAction({
             adminId: req.user.id,
             action: 'WORKER_APPROVE',
-            targetType: 'WorkerProfile',
-            targetId: worker._id,
+            targetType: 'TechnicianProfile',
+            targetId: technician._id,
             details: { previousStatus: 'PENDING' }
         });
 
-        res.status(200).json({ status: 'success', data: { worker } });
+        res.status(200).json({ status: 'success', data: { technician } });
     } catch (error) {
         next(error);
     }
 };
 
-exports.rejectWorker = async (req, res, next) => {
+exports.rejectTechnician = async (req, res, next) => {
     try {
-        const worker = await WorkerProfile.findById(req.params.id);
-        if (!worker) return next(new AppError('Worker not found', 404));
+        const technician = await TechnicianProfile.findById(req.params.id);
+        if (!technician) return next(new AppError('Technician not found', 404));
 
-        worker.documents.verificationStatus = 'REJECTED';
-        // worker.isOnline = false; // Force offline? Yes.
-        await worker.save();
+        technician.documents.verificationStatus = 'REJECTED';
+        // technician.isOnline = false; // Force offline? Yes.
+        await technician.save();
 
         // LOG ACTION
         await adminService.logAction({
             adminId: req.user.id,
             action: 'WORKER_REJECT',
-            targetType: 'WorkerProfile',
-            targetId: worker._id
+            targetType: 'TechnicianProfile',
+            targetId: technician._id
         });
 
-        res.status(200).json({ status: 'success', data: { worker } });
+        res.status(200).json({ status: 'success', data: { technician } });
     } catch (error) {
         next(error);
     }
@@ -187,7 +187,7 @@ exports.getAllServices = async (req, res, next) => {
         }
 
         const services = await Service.find(filter)
-            .populate('worker', 'name email')
+            .populate('technician', 'name email')
             .sort('-createdAt');
 
         res.status(200).json({
@@ -234,7 +234,7 @@ exports.getAllBookings = async (req, res, next) => {
 
         const bookings = await Booking.find(filter)
             .populate('customer', 'name email')
-            .populate('worker', 'name email phone')
+            .populate('technician', 'name email phone')
             .populate('service', 'title price')
             .sort('-createdAt');
 
@@ -276,7 +276,7 @@ exports.cancelBooking = async (req, res, next) => {
         next(error);
     }
 };
-exports.createWorker = async (req, res, next) => {
+exports.createTechnician = async (req, res, next) => {
     try {
         const { name, email, password, phone, bio, skills } = req.body;
 
@@ -286,13 +286,13 @@ exports.createWorker = async (req, res, next) => {
             email,
             password,
             passwordConfirm: password,
-            role: 'WORKER',
+            role: 'TECHNICIAN',
             phone,
             isActive: true
         });
 
-        // 2. Create Worker Profile
-        const newProfile = await WorkerProfile.create({
+        // 2. Create Technician Profile
+        const newProfile = await TechnicianProfile.create({
             user: newUser._id,
             bio: bio || 'Expert Technician',
             skills: skills || [],

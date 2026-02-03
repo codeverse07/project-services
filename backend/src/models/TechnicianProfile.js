@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const workerProfileSchema = new mongoose.Schema({
+const technicianProfileSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: [true, 'Worker profile must belong to a user.'],
+        required: [true, 'Technician profile must belong to a user.'],
         unique: true
     },
     profilePhoto: {
@@ -15,10 +15,10 @@ const workerProfileSchema = new mongoose.Schema({
         type: String,
         maxlength: [500, 'Bio cannot be more than 500 characters']
     },
-    skills: [{
-        type: String,
-        trim: true
-    }],
+    skills: {
+        type: [String],
+        validate: [v => v.length <= 2, 'A technician can have a maximum of 2 service categories.']
+    },
     isOnline: {
         type: Boolean,
         default: false
@@ -48,20 +48,31 @@ const workerProfileSchema = new mongoose.Schema({
         aadharCard: String,
         panCard: String,
         resume: String,
+        drivingLicense: String,
+        certificates: [String],
         verificationStatus: {
             type: String,
             enum: ['PENDING', 'VERIFIED', 'REJECTED'],
             default: 'PENDING'
         }
-    }
+    },
+    pushSubscriptions: [
+        {
+            endpoint: String,
+            keys: {
+                p256dh: String,
+                auth: String
+            }
+        }
+    ]
 }, {
     timestamps: true
 });
 
-workerProfileSchema.index({ skills: 1 });
-workerProfileSchema.index({ isOnline: 1 });
-// workerProfileSchema.index({ user: 1 }); // Duplicate of schema definition
+technicianProfileSchema.index({ skills: 1 });
+technicianProfileSchema.index({ isOnline: 1 });
+// technicianProfileSchema.index({ user: 1 }); // Duplicate of schema definition
 
-const WorkerProfile = mongoose.model('WorkerProfile', workerProfileSchema);
+const TechnicianProfile = mongoose.model('TechnicianProfile', technicianProfileSchema);
 
-module.exports = WorkerProfile;
+module.exports = TechnicianProfile;

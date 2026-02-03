@@ -36,7 +36,7 @@ const LoginPage = () => {
     const formRef = useRef(null);
     const rightSectionRef = useRef(null);
     const navigate = useNavigate();
-    const { login, register } = useUser();
+    const { login, register, error } = useUser();
     const [isLoading, setIsLoading] = useState(false);
     const [isExistingCustomer, setIsExistingCustomer] = useState(true);
 
@@ -119,20 +119,22 @@ const LoginPage = () => {
             // LOGIN FLOW
             const result = await login(email, password);
             if (result.success) {
-                navigate('/');
+                if (result.user?.role === 'TECHNICIAN') {
+                    navigate('/technician/dashboard');
+                } else {
+                    navigate('/');
+                }
             } else {
-                // You might want to show this error in the UI differently
                 alert(result.message || 'Login failed');
             }
         } else {
             // REGISTER FLOW
-            // Note: Backend requires passwordConfirm. We are using the same password here.
-            // Also backend currently ignores phone/address in authController.register but we send them anyway 
-            // incase backend is updated or we chain an update call.
-            const result = await register(name, email, password, password);
-
-            // Wait, useUser gives us 'register' function. 
-            // I need to destructure it from useUser() hook above.
+            const result = await register(name, email, password, password, phone);
+            if (result.success) {
+                navigate('/');
+            } else {
+                alert(result.message || 'Registration failed');
+            }
         }
         setIsLoading(false);
     };
@@ -280,6 +282,15 @@ const LoginPage = () => {
                                 <img src="https://www.facebook.com/favicon.ico" className="w-4 h-4" alt="Facebook" />
                                 <span className="text-sm font-bold text-slate-700">Facebook</span>
                             </button>
+                        </div>
+
+                        <div className="pt-6 text-center border-t border-slate-100 mt-6">
+                            <p className="text-sm text-slate-500">
+                                Are you a service professional?{' '}
+                                <Link to="/technician/login" className="font-bold text-blue-600 hover:text-blue-700 underline underline-offset-4">
+                                    Technician Portal
+                                </Link>
+                            </p>
                         </div>
                     </form>
                 </div>

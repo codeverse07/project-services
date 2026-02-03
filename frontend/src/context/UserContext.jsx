@@ -72,7 +72,7 @@ export const UserProvider = ({ children }) => {
         try {
             const { data } = await client.post('/auth/login', { email, password });
             setUser(data.data.user);
-            return { success: true };
+            return { success: true, user: data.data.user };
         } catch (err) {
             const msg = err.response?.data?.message || 'Login failed';
             setError(msg);
@@ -88,7 +88,7 @@ export const UserProvider = ({ children }) => {
         try {
             const { data } = await client.post('/auth/register', { name, email, password, passwordConfirm, phone, role });
             setUser(data.data.user);
-            return { success: true };
+            return { success: true, user: data.data.user };
         } catch (err) {
             const msg = err.response?.data?.message || 'Registration failed';
             setError(msg);

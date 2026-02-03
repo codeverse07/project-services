@@ -15,21 +15,21 @@ router.use(authMiddleware.protect);
 
 router.post(
     '/',
-    authMiddleware.restrictTo('WORKER', 'ADMIN'),
+    authMiddleware.restrictTo('TECHNICIAN', 'ADMIN'),
     validate(serviceValidation.createService),
     serviceController.createService
 );
 
 router.patch(
     '/:id',
-    authMiddleware.restrictTo('WORKER'),
+    authMiddleware.restrictTo('TECHNICIAN'),
     validate(serviceValidation.updateService),
     serviceController.updateService
 );
 
 router.delete(
     '/:id',
-    authMiddleware.restrictTo('WORKER', 'ADMIN'),
+    authMiddleware.restrictTo('TECHNICIAN', 'ADMIN'),
     serviceController.deleteService
 );
 

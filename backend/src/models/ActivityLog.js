@@ -20,7 +20,7 @@ const activityLogSchema = new mongoose.Schema({
     targetType: {
         type: String,
         required: [true, 'Log must have a target entity type'],
-        enum: ['User', 'WorkerProfile', 'Service', 'Booking', 'System']
+        enum: ['User', 'TechnicianProfile', 'Service', 'Booking', 'System']
     },
     targetId: {
         type: mongoose.Schema.Types.ObjectId,

@@ -19,7 +19,7 @@ const workerUser = {
     email: `upload_worker_${Date.now()}@example.com`,
     password: "Password123!",
     passwordConfirm: "Password123!",
-    role: "WORKER"
+    role: "TECHNICIAN"
 };
 
 async function runTest() {

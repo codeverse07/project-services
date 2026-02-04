@@ -71,19 +71,23 @@ const BookingModal = ({ isOpen, onClose, service, onConfirm }) => {
 
         // Simulate network delay
         setTimeout(() => {
+            // Construct ISO Date string from separate date and time
+            const DateTime = new Date(`${formData.date}T${formData.time}`);
+
             const bookingData = {
-                ...formData,
                 serviceId: service.id,
+                scheduledAt: DateTime.toISOString(),
+                notes: `Plan: ${activePlan.name}. ${formData.description}`, // Combine plan and description
+                price: activePlan.price,
+                // Additional fields for context if needed locally, but backend ignores extras
                 serviceName: service.title,
                 subServiceName: activePlan.name,
-                image: service.image,
-                price: activePlan.price
+                image: service.image
             };
 
-            // Only include shifting-specific fields for relevant services
-            if (!isShiftingOrTransport) {
-                delete bookingData.dropLocation;
-                delete bookingData.pickupLocation;
+            // Only include shifting-specific fields for relevant services in notes for now as backend schema might not support separate fields yet
+            if (isShiftingOrTransport) {
+                bookingData.notes += `\nPickup: ${formData.pickupLocation}\nDrop: ${formData.dropLocation}`;
             }
 
             onConfirm(bookingData);

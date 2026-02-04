@@ -88,17 +88,10 @@ export const BookingProvider = ({ children }) => {
                 setBookings(prev => [transformBooking(createdBooking), ...prev]);
             }
         } catch (err) {
-            console.warn("Backend booking failed (Guest Mode). Adding locally.", err);
-            // Fallback: Create a fake booking object locally
-            const fakeBooking = {
-                _id: Date.now().toString(),
-                service: { title: newBooking.serviceName },
-                status: 'PENDING',
-                scheduledAt: new Date().toISOString(),
-                price: newBooking.price,
-                // ... map other fields if needed for display
-            };
-            setBookings(prev => [transformBooking(fakeBooking), ...prev]);
+            console.error("Backend booking failed:", err);
+            // Do NOT add fake booking locally. Let the UI handle the error (or add toast here later)
+            // Rethrowing so the component knows it failed
+            throw err;
         }
     };
 

@@ -107,10 +107,16 @@ const ServicesPage = () => {
         }
     };
 
-    const handleConfirmBooking = (bookingData) => {
-        addBooking(bookingData);
-        setIsModalOpen(false);
-        navigate('/bookings');
+    const handleConfirmBooking = async (bookingData) => {
+        try {
+            await addBooking(bookingData);
+            setIsModalOpen(false);
+            navigate('/bookings');
+        } catch (error) {
+            console.error("Booking failed:", error);
+            alert("Failed to create booking. Please try again.");
+            // Do not close modal or navigate so user can retry
+        }
     };
 
     const getCategoryIcon = (id) => {
@@ -412,6 +418,10 @@ const ServicesPage = () => {
                     <MobileServiceDetail
                         serviceId={selectedService.id}
                         onClose={() => setIsMobileDetailOpen(false)}
+                        onBook={() => {
+                            setIsMobileDetailOpen(false);
+                            setIsModalOpen(true);
+                        }}
                     />
                 )
             }

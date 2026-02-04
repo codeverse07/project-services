@@ -12,7 +12,7 @@ import basicImg from '../../assets/services/basic.png';
 import premiumImg from '../../assets/services/premium.png';
 import consultationImg from '../../assets/services/consultation.png';
 
-const MobileServiceDetail = ({ serviceId, onClose }) => {
+const MobileServiceDetail = ({ serviceId, onClose, onBook }) => {
     const navigate = useNavigate();
     const { addBooking } = useBookings();
     const { services } = useAdmin();
@@ -63,17 +63,10 @@ const MobileServiceDetail = ({ serviceId, onClose }) => {
             return;
         }
 
-        addBooking({
-            serviceId: service.id,
-            serviceName: service.title,
-            subServiceName: activeSubService.name,
-            price: activeSubService.price,
-            image: service.image,
-            pickupLocation: isShiftingOrTransport ? pickupLocation : undefined,
-            dropLocation: isShiftingOrTransport ? dropLocation : undefined
-        });
-        onClose();
-        navigate('/bookings');
+        // Delegate to parent to open the full BookingModal (which handles Date/Time/Persistence correctly)
+        if (onBook) {
+            onBook(activeSubService);
+        }
     };
 
     return (
